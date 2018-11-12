@@ -31,6 +31,7 @@
             firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 // User is signed in.
+                console.log("sign in");
                 var displayName = user.displayName;
                 var email = user.email;
                 var emailVerified = user.emailVerified;
@@ -40,7 +41,7 @@
                 var providerData = user.providerData;
                 user.getIdToken().then(function(accessToken) {
                 document.getElementById('sign-in-status').textContent = 'Signed in';
-                document.getElementById('sign-in').textContent = 'Sign out';
+                //document.getElementById('sign-in').textContent = 'Sign out';
                 document.getElementById('account-details').textContent = JSON.stringify({
                     displayName: displayName,
                     email: email,
@@ -54,8 +55,9 @@
                 });
             } else {
                 // User is signed out.
+                console.log("sign out");
                 document.getElementById('sign-in-status').textContent = 'Signed out';
-                document.getElementById('sign-in').textContent = 'Sign in';
+                //document.getElementById('sign-in').textContent = 'Sign in';
                 document.getElementById('account-details').textContent = 'null';
             }
             }, function(error) {
