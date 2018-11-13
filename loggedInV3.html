@@ -20,6 +20,50 @@
             messagingSenderId: "239648283120"
         };
         firebase.initializeApp(config);
+
+
+         // Get a reference to the database service
+        var database = firebase.database();
+        console.log(database);
+        // Get a reference to the database root
+        var root = database.ref();
+        console.log(root);
+        // Create child node
+        var classRoot = root.child("classes");
+        console.log(classRoot);
+        
+        showFirebaseTable();
+        
+        
+        function showFirebaseTable(){
+
+            classRoot.on("child_added", function(snapshot){
+            //    console.log(snapshot.key);
+            //    console.log(snapshot.val());
+
+            var mySnap =snapshot.val();
+
+            var myKey  = snapshot.key;
+            console.log("myKey "+ myKey);
+            console.log(mySnap);
+             
+           
+        });
+        }
+        
+
+             
+
+            function addRowFireBase(MydisplayName, myClass, myEmail){
+
+                classRoot.push().set({
+                    teacher: MydisplayName,
+                    className: myClass,
+                    email: myEmail
+                
+            });
+            }
+        
         </script>
 
         <!-- *******************************************************************************************
@@ -27,12 +71,26 @@
         * Firebase Console > Overview > Add Firebase to your web app. *
         ***************************************************************************************** -->
         <script type="text/javascript">
+            function setUser(user){
+                var displayName = user.displayName;
+                console.log(displayName);
+                var email = user.email;
+                var emailVerified = user.emailVerified;
+                var photoURL = user.photoURL;
+                var uid = user.uid;
+                var phoneNumber = user.phoneNumber;
+                var providerData = user.providerData;
+            }
+
             initApp = function() {
                 firebase.auth().onAuthStateChanged(function(user) {
                 if (user) {
                     // User is signed in.
                     console.log("sign in");
+
+                    setUser(user);
                     var displayName = user.displayName;
+                    
                     var email = user.email;
                     var emailVerified = user.emailVerified;
                     var photoURL = user.photoURL;
@@ -40,11 +98,8 @@
                     var phoneNumber = user.phoneNumber;
                     var providerData = user.providerData;
                     user.getIdToken().then(function(accessToken) {
-                    document.getElementById('sign-in-status').textContent = 'Signed in';
-                    //document.getElementById('sign-in').textContent = 'Sign out';
-
-                    
-                    
+                    ////document.getElementById('sign-in-status').textContent = 'Signed in';
+                    //document.getElementById('sign-in').textContent = 'Sign out';      
 
                     var _userInfo = JSON.stringify({
                         displayName: displayName,
@@ -59,15 +114,15 @@
 
                     // render the user screen with login information
                      
-                     userHandler(_userInfo);
+                     userHandler(displayName, email);
                     
                     });
                 } else {
                     // User is signed out.
                     console.log("sign out");
-                    document.getElementById('sign-in-status').textContent = 'Signed out';
+                    ////document.getElementById('sign-in-status').textContent = 'Signed out';
                     //document.getElementById('sign-in').textContent = 'Sign in';
-                    document.getElementById('account-details').textContent = 'null';
+                    ////document.getElementById('account-details').textContent = 'null';
                 }
                 }, function(error) {
                 console.log(error);
@@ -79,23 +134,11 @@
             });
 
             // populate the users logged in screen
-            function userHandler(info){
-
-                JSON.parse(info, (key, value) => { 
-                    if(key == "photoURL" && value !== null){
-                        console.log(typeof value);
-                        console.log(value);
-                        var myImg = document.getElementById('userImg')
-                        myImg.src = value;
-                    }
-                   
-                });
-
-                document.getElementById('account-details').textContent = info;
-                //console.log(typeof info );
-                //document.getElementById('userImg').setAttribute("src", info.photoURL );
-
+            function userHandler(myName, myEmail){
+                console.log(myName + ' ' + myEmail);
+                addRowFireBase(myName, "History105", myEmail);
             }
+            
         </script>
     
     
