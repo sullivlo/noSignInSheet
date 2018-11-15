@@ -51,18 +51,9 @@
         });
         }
         
+        
 
-             
-
-        function addRowFireBase(MydisplayName, myClass, myEmail){
-
-            classRoot.push().set({
-                teacher: MydisplayName,
-                className: myClass,
-                email: myEmail
-                
-            });
-        }
+        
         
         </script>
 
@@ -112,9 +103,9 @@
                         providerData: providerData
                     }, null, '  ');
 
-                    // render the user screen with login information
+                    // render the user screen with login information                  
+                    userHandler(displayName, email);
                      
-                     //userHandler(displayName, email);
                     
                     });
                 } else {
@@ -133,10 +124,34 @@
                 initApp()
             });
 
-            // populate the users logged in screen
-            function userHandler(myName, myEmail){
+            function addRowFireBase(MydisplayName, myClass, myEmail){
+
+                classRoot.push().set({
+                teacher: MydisplayName,
+                className: myClass,
+                email: myEmail
+                
+                });
+            }
+            
+            //user variables
+            var myName = null;
+            var myEmail = null;
+
+            //called from submit button
+            function addClassName(){
+                console.log("in add class name");
+                var myClassName = document.getElementById("ib_ClassName").value;
                 console.log(myName + ' ' + myEmail);
-                addRowFireBase(myName, "History105", myEmail);
+                addRowFireBase(myName, myClassName, myEmail);
+                
+            }
+            
+            // populate the users logged in screen
+            function userHandler(name, email){
+                myName = name;
+                myEmail = email;
+                
             }
             
         </script>
@@ -149,5 +164,9 @@
         <img id = "userImg" src="" />
         <div id="sign-in"></div>
         <div id="account-details"></div>
+        
+        Class name: <input id= "ib_ClassName" type="text" name="FirstName" value=""><br>
+        <input type="submit" value="Submit" onclick="addClassName()">
+            
         
   </body>
