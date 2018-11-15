@@ -32,6 +32,9 @@
         var classRoot = root.child("classes");
         console.log(classRoot);
         
+        
+        
+
         showFirebaseTable();
         
         
@@ -44,16 +47,12 @@
             var mySnap =snapshot.val();
 
             var myKey  = snapshot.key;
-            console.log("myKey "+ myKey);
+            //console.log("myKey "+ myKey);
             console.log(mySnap);
-             
-           
+         
         });
         }
-        
-        
-
-        
+                
         
         </script>
 
@@ -62,16 +61,7 @@
         * Firebase Console > Overview > Add Firebase to your web app. *
         ***************************************************************************************** -->
         <script type="text/javascript">
-            function setUser(user){
-                var displayName = user.displayName;
-                console.log(displayName);
-                var email = user.email;
-                var emailVerified = user.emailVerified;
-                var photoURL = user.photoURL;
-                var uid = user.uid;
-                var phoneNumber = user.phoneNumber;
-                var providerData = user.providerData;
-            }
+            
 
             initApp = function() {
                 firebase.auth().onAuthStateChanged(function(user) {
@@ -79,7 +69,7 @@
                     // User is signed in.
                     console.log("sign in");
 
-                    setUser(user);
+                   
                     var displayName = user.displayName;
                     
                     var email = user.email;
@@ -130,13 +120,10 @@
                 teacher: MydisplayName,
                 className: myClass,
                 email: myEmail
+
                 
-                });
+                });  
             }
-            
-            //user variables
-            var myName = null;
-            var myEmail = null;
 
             //called from submit button
             function addClassName(){
@@ -147,13 +134,61 @@
                 
             }
             
-            // populate the users logged in screen
+            // user variables
+            var myName = null;
+            var myEmail = null;
+
+            // set the user variables
+            // bad implementation but google auth user can not be reference
+            //  w/o passing user handler the user's info
             function userHandler(name, email){
                 myName = name;
                 myEmail = email;
                 
             }
             
+            //allows the teacher to create a new session
+            // to call this function pass a reference to the
+            // class toDo: pass by myRefToMyClass
+            function addSession(){
+                var myRoot =  "-LRKV1nezHnu3JcYdCm0";
+
+                var myRef = "classes/"+myRoot
+                
+                // Have to push child session before it it created in firebase
+                var nameRef = root.child(myRef);
+                var nameRef = nameRef.child("sessions");
+                console.log(nameRef);
+                // toDo: pass the teachers current gps location
+                nameRef.push().set({
+                    location: "MyLocation",
+                    students: "Louis Sullivan",
+                    totalAttendees: "0",
+                    date: "11/14/2018"
+
+                });
+            }
+
+            //allows the student to add them selves to a class
+            // to call this function pass a reference to the
+            // class toDo: pass by myRefToMyClass
+            function addStudent(){
+                var myRoot =  "-LRKV1nezHnu3JcYdCm0";
+
+                var myRef = "classes/"+myRoot
+                
+                // Have to push child students before it it created in firebase
+                var nameRef = root.child(myRef);
+                var studentRef = nameRef.child("students");
+                console.log(studentRef);
+                // toDo: pass the students by current users name, email
+                studentRef.push().set({
+                    name: "MyName",
+                    email: "myEmail"
+
+                });
+            }
+ 
         </script>
     
     
@@ -166,7 +201,17 @@
         <div id="account-details"></div>
         
         Class name: <input id= "ib_ClassName" type="text" name="FirstName" value=""><br>
-        <input type="submit" value="Submit" onclick="addClassName()">
+        <input type="submit" value="addClass" onclick="addClassName()">
+        <br><br><br>
+        <input type="submit" value="addSessionToClass" onclick="addSession()"> 
+
+        <br><br><br>
+        <input type="submit" value="addStudentsToClass" onclick="addStudent()">
+
+
+        
+       
+
             
         
   </body>
