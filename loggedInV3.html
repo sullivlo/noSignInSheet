@@ -175,46 +175,45 @@
                 });
             }
 
-            //allows the student to add them selves to a class
-            // to call this function pass a reference to the
-            // class toDo: pass by variable
+            /*******
+            * allows the student to add them selves to a class
+            * to call this function 
+            * pass the class reference to root
+            ********/
             function addStudent(myRoot){
 
                 /**
-                    get the current reference from the root to 
+                    get the current class reference from the root 
                 */
-                // Have to push child students before it it created in firebase
                 var nameRef = root.child(myRoot);
                 
-                // Have to push child students before it it created in firebase
                 /****
                 * push students to current class node
+                *  Have to push child students before it it created in firebase
                 ******/
                 var studentRef = nameRef.child("students");
                 console.log(myEmail);
 
                 console.log(studentRef);
-                // toDo: pass the students by current users name, email
+                
+                /*
+                * Pass the current users emal, name to the class student list
+                */
                 studentRef.push().set({
                     name: myName,
                     email: myEmail
 
                 });
             }
-
+            
+            /*****
+            * Build the table using the firebase data
+            *
+            *******/
             function helpBuildTable(className, email, Classkey){
-                //myID = myID.replace("-", "Louis");
-                //myID = myID.replace("_", "Sullivan")
-                
-				
-				//console.log(myID);
-
-				//var holdRemove = friends.child(myID).remove();
 
                 var tmp = "<input type= \"submit\" value=\"Add my self to class\" onclick=\"addStudent('"+ Classkey + "')\"/>";
-                
-    
-
+            
                 document.getElementById("myTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
                     email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
             }
