@@ -191,12 +191,13 @@
                 * push students to current class node
                 ******/
                 var studentRef = nameRef.child("students");
+                console.log(myEmail);
 
                 console.log(studentRef);
                 // toDo: pass the students by current users name, email
                 studentRef.push().set({
-                    name: "MyName007",
-                    email: "myEmail007"
+                    name: myName,
+                    email: myEmail
 
                 });
             }
