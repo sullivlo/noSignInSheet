@@ -204,7 +204,10 @@
                     email: myEmail
 
                 });
+
+                
             }
+            
             
             /*****
             * Build the table using the firebase data
@@ -217,6 +220,22 @@
                 document.getElementById("myTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
                     email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
             }
+
+            /*****
+            * show the student div
+            ******/
+            function showStudent(){
+                document.getElementById("showStudent").style.display = '';
+                document.getElementById("Submit").style.display = 'none';  
+            }
+
+            /*****
+            * show the student div
+            ******/
+            function showTeacher(){
+                document.getElementById("showTeacher").style.display = '';
+                document.getElementById("Submit").style.display = 'none';  
+            }
  
         </script>
     
@@ -228,18 +247,31 @@
         <img id = "userImg" src="" />
         <div id="sign-in"></div>
         <div id="account-details"></div>
+
+        <div id = "Submit">
+            <!-- Show hide student or teacher page-->
+            <h2>Welcome, are you a teacher or a student</h2>
+            <input  type="submit" value="I am a student" onclick="showStudent()">
+            <input  type="submit" value="I am a Teacher" onclick="showTeacher()">
+        </div>
+
+        <!-- visible to the student-->
+        <div id = "showStudent" style="display: none">
+            <table id = myTable>
+                <tr><th>Class Name</th><th>Email</th><th>Class Key</th></tr>
+            </table>
+        </div>
+
+        <!-- visible to the teacher-->
+        <div id = "showTeacher" style="display: none">
+            Class name: <input id= "ib_ClassName" type="text" name="FirstName" value=""><br>
+            <input type="submit" value="addClass" onclick="addClassName()">
+            <br><br><br>
+            <input type="submit" value="addSessionToClass" onclick="addSession()"> 
+    
         
-        Class name: <input id= "ib_ClassName" type="text" name="FirstName" value=""><br>
-        <input type="submit" value="addClass" onclick="addClassName()">
-        <br><br><br>
-        <input type="submit" value="addSessionToClass" onclick="addSession()"> 
-
-        <br><br><br>
-        <input type="submit" value="addStudentsToClass" onclick="addStudent()">
-
-        <table id = myTable>
-            <tr><th>Class Name</th><th>Email</th><th>Class Key</th></tr>
-        </table>
+        
+        </div>
         
        
 
