@@ -55,6 +55,8 @@
             var Classkey = "classes/"+myKey
 
             helpBuildTable(mySnap.className, mySnap.teacher, Classkey);
+
+            helpBuildTeacherTable(mySnap.className, mySnap.teacher, mySnap.email, Classkey);
          
         });
         }
@@ -153,24 +155,50 @@
                 
             }
             
-            //allows the teacher to create a new session
-            // to call this function pass a reference to the
-            // class toDo: pass by myRefToMyClass
-            function addSession(){
-                var myRoot =  "-LRKV1nezHnu3JcYdCm0";
+            /*****
+            *  get the teacher gps location
+            *
+            *****/
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+            }
+            
+            /*****
+            *  show the teacher gps location
+            *
+            *****/
+            function showPosition(position) {
+                myLocation  = "Latitude: " + position.coords.latitude + 
+                " Longitude: " + position.coords.longitude; 
+            }
 
-                var myRef = "classes/"+myRoot
+            /*****
+            * allows the teacher to create a new session
+            * to call this function pass a reference to the class
+            *******/
+
+            var myLocation = null;
+            
+            function addSession(myRef){ 
                 
+                var myTime = new Date().toLocaleString();
+
+                getLocation();
+
                 // Have to push child session before it it created in firebase
                 var nameRef = root.child(myRef);
                 var nameRef = nameRef.child("sessions");
                 console.log(nameRef);
                 // toDo: pass the teachers current gps location
                 nameRef.push().set({
-                    location: "MyLocation",
+                    location: myLocation,
                     students: "Louis Sullivan",
                     totalAttendees: "0",
-                    date: "11/14/2018"
+                    date: myTime
 
                 });
             }
@@ -220,6 +248,19 @@
                 document.getElementById("myTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
                     email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
             }
+            
+            /*****
+            * Build the teacher table using the firebase data
+            *
+            *******/
+           
+            function helpBuildTeacherTable(className, TeacherName, email, Classkey){
+
+                var tmp = "<input type= \"submit\" value=\"Add session\" onclick=\"addSession('"+ Classkey + "')\"/>";
+
+                document.getElementById("teacherTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + 
+                "<td>" + TeacherName + "</td><td>" +  email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
+            }
 
             /*****
             * show the student div
@@ -268,6 +309,11 @@
             <input type="submit" value="addClass" onclick="addClassName()">
             <br><br><br>
             <input type="submit" value="addSessionToClass" onclick="addSession()"> 
+
+            <br><br><br>
+            <table id = teacherTable>
+                <tr><th>Class Name</th><th>Teacher Name</th><th>Teacher Email</th><th>Add Session</th></tr>
+            </table>
     
         
         
