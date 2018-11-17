@@ -47,8 +47,14 @@
             var mySnap =snapshot.val();
 
             var myKey  = snapshot.key;
-            //console.log("myKey "+ myKey);
+            console.log("myKey "+ myKey);
             console.log(mySnap);
+
+              
+
+            var Classkey = "classes/"+myKey
+
+            helpBuildTable(mySnap.className, mySnap.teacher, Classkey);
          
         });
         }
@@ -171,22 +177,45 @@
 
             //allows the student to add them selves to a class
             // to call this function pass a reference to the
-            // class toDo: pass by myRefToMyClass
-            function addStudent(){
-                var myRoot =  "-LRKV1nezHnu3JcYdCm0";
+            // class toDo: pass by variable
+            function addStudent(myRoot){
 
-                var myRef = "classes/"+myRoot
+                /**
+                    get the current reference from the root to 
+                */
+                // Have to push child students before it it created in firebase
+                var nameRef = root.child(myRoot);
                 
                 // Have to push child students before it it created in firebase
-                var nameRef = root.child(myRef);
+                /****
+                * push students to current class node
+                ******/
                 var studentRef = nameRef.child("students");
+
                 console.log(studentRef);
                 // toDo: pass the students by current users name, email
                 studentRef.push().set({
-                    name: "MyName",
-                    email: "myEmail"
+                    name: "MyName007",
+                    email: "myEmail007"
 
                 });
+            }
+
+            function helpBuildTable(className, email, Classkey){
+                //myID = myID.replace("-", "Louis");
+                //myID = myID.replace("_", "Sullivan")
+                
+				
+				//console.log(myID);
+
+				//var holdRemove = friends.child(myID).remove();
+
+                var tmp = "<input type= \"submit\" value=\"Add my self to class\" onclick=\"addStudent('"+ Classkey + "')\"/>";
+                
+    
+
+                document.getElementById("myTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
+                    email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
             }
  
         </script>
@@ -208,7 +237,9 @@
         <br><br><br>
         <input type="submit" value="addStudentsToClass" onclick="addStudent()">
 
-
+        <table id = myTable>
+            <tr><th>Class Name</th><th>Email</th><th>Class Key</th></tr>
+        </table>
         
        
 
