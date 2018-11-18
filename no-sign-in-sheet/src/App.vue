@@ -1,17 +1,6 @@
 <template>
   <v-app>
-    <v-toolbar app>
-
-      
-      <v-toolbar-title class="headline text-uppercase">
-        <router-link to="/" tag="span" exact>
-            <a style="text-decoration: none">No Sign-in Sheet</a>
-        </router-link>
-      </v-toolbar-title>
-
-      <v-spacer></v-spacer>
-      <v-menu offset-y open-on-hover>
-        <v-toolbar-side-icon slot="activator"></v-toolbar-side-icon>
+     <v-navigation-drawer v-model="drawer" absolute temporary right>
         <v-list>
               <v-list-tile
                 v-for="(item, i) in items"
@@ -21,10 +10,20 @@
                 <v-list-tile-title>{{ item.title }}</v-list-tile-title>
               </v-list-tile>
             </v-list>
-      </v-menu>
-      
+      </v-navigation-drawer>
+
+    <v-toolbar app>
+      <v-toolbar-title class="headline text-uppercase">
+        <router-link to="/" tag="span" exact>
+           <a style="text-decoration: none"><img src="@/assets/logo.png" alt="logo" width="20" height="20"> No Sign-in Sheet</a>
+        </router-link>
+      </v-toolbar-title>
+
+      <v-spacer></v-spacer>
+      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
     </v-toolbar>
 
+  
     <v-content>
       <router-view></router-view>
     </v-content>
@@ -56,7 +55,8 @@ export default {
       items: [
         { title: "Settings", component: "settings" },
         { title: "Log Out", component: "logOut" }
-      ]
+      ],
+      drawer: null
     };
   },
   methods: {
