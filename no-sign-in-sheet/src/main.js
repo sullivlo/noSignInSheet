@@ -12,9 +12,9 @@ new Vue({
   created() {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        this.$router.push("/logout-success");
+        this.$router.push("/");
       } else {
-        this.$router.push("/auth");
+        this.$router.push("/login");
       }
     });
   },
