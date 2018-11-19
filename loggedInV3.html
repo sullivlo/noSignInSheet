@@ -32,25 +32,18 @@
         var classRoot = root.child("classes");
         console.log(classRoot);
         
-        
-        
-
         showFirebaseTable();
         
         
         function showFirebaseTable(){
 
             classRoot.on("child_added", function(snapshot){
-            //    console.log(snapshot.key);
-            //    console.log(snapshot.val());
 
             var mySnap =snapshot.val();
 
             var myKey  = snapshot.key;
             console.log("myKey "+ myKey);
             console.log(mySnap);
-
-              
 
             var Classkey = "classes/"+myKey
 
@@ -277,7 +270,35 @@
                 document.getElementById("showTeacher").style.display = '';
                 document.getElementById("Submit").style.display = 'none';  
             }
- 
+            
+
+
+            function searchFireBaseForStudent(myRoot){
+                //var tableString = document.getElementById("searchTable").value.toLowerCase();;
+                var Mycount =0;
+
+                 /**
+                    get the current class reference from the root 
+                */
+                var nameRef = root.child(myRoot);
+                
+                /****
+                * push students to current class node
+                *  Have to push child students before it it created in firebase
+                ******/
+                var studentRef = nameRef.child("students");
+
+                studentRef.once("value").then(function (snapshot){
+                    snapshot.forEach(function(childSnapshot) {
+                        var MyName = childSnapshot.val().name;
+                        
+                        console.log("Your name was found");
+                         
+                            
+                        });
+                });
+                                
+            }
         </script>
     
     
@@ -299,7 +320,7 @@
         <!-- visible to the student-->
         <div id = "showStudent" style="display: none">
             <table id = myTable>
-                <tr><th>Class Name</th><th>Email</th><th>Class Key</th></tr>
+                <tr><th>Class Name</th><th>Teacher Name</th><th>Class Key</th></tr>
             </table>
         </div>
 
@@ -307,9 +328,7 @@
         <div id = "showTeacher" style="display: none">
             Class name: <input id= "ib_ClassName" type="text" name="FirstName" value=""><br>
             <input type="submit" value="addClass" onclick="addClassName()">
-            <br><br><br>
-            <input type="submit" value="addSessionToClass" onclick="addSession()"> 
-
+             
             <br><br><br>
             <table id = teacherTable>
                 <tr><th>Class Name</th><th>Teacher Name</th><th>Teacher Email</th><th>Add Session</th></tr>
