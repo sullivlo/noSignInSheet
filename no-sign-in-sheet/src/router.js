@@ -32,6 +32,10 @@ const router = new Router({
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: "*",
+      redirect: "/"
     }
   ]
 });
@@ -39,6 +43,8 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
   const currentUser = firebase.auth().currentUser;
+
+  //thanks https://medium.com/dailyjs/authenticating-a-vue-js-application-with-firebase-ui-8870a3a5cff8
 
   if (requiresAuth && !currentUser) {
     next("/login");
