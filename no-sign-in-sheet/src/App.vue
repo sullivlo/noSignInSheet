@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import firebase from "firebase";
 export default {
   name: "App",
   data() {
@@ -64,7 +65,12 @@ export default {
   methods: {
     menuClicked(key) {
       console.log(key.title);
-      this.$router.push({ name: key.component });
+      if (key.component == "logOut") {
+        firebase.auth().signOut();
+        location.reload();
+      } else {
+        this.$router.push({ name: key.component });
+      }
     }
   }
 };
