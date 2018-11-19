@@ -3,6 +3,7 @@ import "./plugins/vuetify";
 import App from "./App.vue";
 import router from "./router";
 import firebase from "firebase";
+import config from "../vue.config.js";
 
 
 Vue.config.productionTip = false;
@@ -12,7 +13,7 @@ new Vue({
   created() {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        this.$router.push("/");
+        this.$router.push(config.baseUrl);
       } else {
         this.$router.push("/login");
       }
