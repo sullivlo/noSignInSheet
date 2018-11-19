@@ -32,25 +32,18 @@
         var classRoot = root.child("classes");
         console.log(classRoot);
         
-        
-        
-
         showFirebaseTable();
         
         
         function showFirebaseTable(){
 
             classRoot.on("child_added", function(snapshot){
-            //    console.log(snapshot.key);
-            //    console.log(snapshot.val());
 
             var mySnap =snapshot.val();
 
             var myKey  = snapshot.key;
             console.log("myKey "+ myKey);
             console.log(mySnap);
-
-              
 
             var Classkey = "classes/"+myKey
 
@@ -155,11 +148,14 @@
                 
             }
             
+            var myLocation = null;
+
             /*****
             *  get the teacher gps location
             *
             *****/
             function getLocation() {
+                console.log("in location");
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(showPosition);
                 } else {
@@ -171,9 +167,13 @@
             *  show the teacher gps location
             *
             *****/
+            
             function showPosition(position) {
-                myLocation  = "Latitude: " + position.coords.latitude + 
+                console.log("in showPosition");
+                myLocation  = " latitude: " +  position.coords.latitude
+                +
                 " Longitude: " + position.coords.longitude; 
+                console.log(myLocation);
             }
 
             /*****
@@ -181,13 +181,14 @@
             * to call this function pass a reference to the class
             *******/
 
-            var myLocation = null;
+            getLocation();
             
             function addSession(myRef){ 
                 
                 var myTime = new Date().toLocaleString();
 
-                getLocation();
+
+                console.log("in add sessions " + myLocation);
 
                 // Have to push child session before it it created in firebase
                 var nameRef = root.child(myRef);
@@ -277,7 +278,35 @@
                 document.getElementById("showTeacher").style.display = '';
                 document.getElementById("Submit").style.display = 'none';  
             }
- 
+            
+
+
+            function searchFireBaseForStudent(myRoot){
+                //var tableString = document.getElementById("searchTable").value.toLowerCase();;
+                var Mycount =0;
+
+                 /**
+                    get the current class reference from the root 
+                */
+                var nameRef = root.child(myRoot);
+                
+                /****
+                * push students to current class node
+                *  Have to push child students before it it created in firebase
+                ******/
+                var studentRef = nameRef.child("students");
+
+                studentRef.once("value").then(function (snapshot){
+                    snapshot.forEach(function(childSnapshot) {
+                        var MyName = childSnapshot.val().name;
+                        
+                        console.log("Your name was found");
+                         
+                            
+                        });
+                });
+                                
+            }
         </script>
     
     
@@ -298,18 +327,20 @@
 
         <!-- visible to the student-->
         <div id = "showStudent" style="display: none">
+            <h4>You are a student, save the world from the sign in sheet</h4>
+            <br><br>
             <table id = myTable>
-                <tr><th>Class Name</th><th>Email</th><th>Class Key</th></tr>
+                <tr><th>Class Name</th><th>Teacher Name</th><th>Class Key</th></tr>
             </table>
         </div>
 
         <!-- visible to the teacher-->
         <div id = "showTeacher" style="display: none">
+            <h4>You are a teacher, save students from the sign in sheet</h4>
+            <br><br>
             Class name: <input id= "ib_ClassName" type="text" name="FirstName" value=""><br>
             <input type="submit" value="addClass" onclick="addClassName()">
-            <br><br><br>
-            <input type="submit" value="addSessionToClass" onclick="addSession()"> 
-
+             
             <br><br><br>
             <table id = teacherTable>
                 <tr><th>Class Name</th><th>Teacher Name</th><th>Teacher Email</th><th>Add Session</th></tr>
