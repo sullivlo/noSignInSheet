@@ -148,11 +148,14 @@
                 
             }
             
+            var myLocation = null;
+
             /*****
             *  get the teacher gps location
             *
             *****/
             function getLocation() {
+                console.log("in location");
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(showPosition);
                 } else {
@@ -164,9 +167,13 @@
             *  show the teacher gps location
             *
             *****/
+            
             function showPosition(position) {
-                myLocation  = "Latitude: " + position.coords.latitude + 
+                console.log("in showPosition");
+                myLocation  = " latitude: " +  position.coords.latitude
+                +
                 " Longitude: " + position.coords.longitude; 
+                console.log(myLocation);
             }
 
             /*****
@@ -174,13 +181,14 @@
             * to call this function pass a reference to the class
             *******/
 
-            var myLocation = null;
+            getLocation();
             
             function addSession(myRef){ 
                 
                 var myTime = new Date().toLocaleString();
 
-                getLocation();
+
+                console.log("in add sessions " + myLocation);
 
                 // Have to push child session before it it created in firebase
                 var nameRef = root.child(myRef);
@@ -319,6 +327,8 @@
 
         <!-- visible to the student-->
         <div id = "showStudent" style="display: none">
+            <h4>You are a student, save the world from the sign in sheet</h4>
+            <br><br>
             <table id = myTable>
                 <tr><th>Class Name</th><th>Teacher Name</th><th>Class Key</th></tr>
             </table>
@@ -326,6 +336,8 @@
 
         <!-- visible to the teacher-->
         <div id = "showTeacher" style="display: none">
+            <h4>You are a teacher, save students from the sign in sheet</h4>
+            <br><br>
             Class name: <input id= "ib_ClassName" type="text" name="FirstName" value=""><br>
             <input type="submit" value="addClass" onclick="addClassName()">
              
