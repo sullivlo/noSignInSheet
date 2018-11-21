@@ -14,6 +14,7 @@ new Vue({
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.$router.push(config.baseUrl);
+        this.$store.commit("SET_LOGIN_PROGRESS", true);
       } else {
         this.$router.push("/login");
       }

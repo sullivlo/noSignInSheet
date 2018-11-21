@@ -8,7 +8,7 @@ import firebaseui from "firebaseui";
 import { config } from "../firebaseConfig";
 
 export default {
-  name: "auth",
+  name: "Login",
   mounted() {
     var uiConfig = {
       signInSuccessUrl: "/",
