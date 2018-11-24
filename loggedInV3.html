@@ -39,33 +39,34 @@
 
             classRoot.on("child_added", function(snapshot){
 
-            var mySnap =snapshot.val();
+                    var mySnap =snapshot.val();
 
-            var myKey  = snapshot.key;
-            //console.log("myKey "+ myKey);
-            
+                    var myKey  = snapshot.key;
+                    //console.log("myKey "+ myKey);
+                    
 
-            var Classkey = "classes/"+myKey
-            
-            // build the class list that the student is not in
-            if(!findStudentInClass(Classkey)){
-                helpBuildTable(mySnap.className, mySnap.teacher, Classkey);
-            }
-            
-            // build the current class list
-            if(findStudentInClass(Classkey)){
-                helpBuildStudentEnrolledTable(mySnap.className, mySnap.teacher, Classkey);
-            }
-            
-            // build the current teacher list based off the currents users email
-            //  only show the teacher their class list
-            if(mySnap.email == myEmail){
-                helpBuildTeacherTable(mySnap.className, mySnap.teacher, mySnap.email, Classkey);
+                    var Classkey = "classes/"+myKey
+                    
+                    var myStudentKey =  findStudentInClass(Classkey);
 
-            }
+                    // build the class list that the student is not in
+                    if(myStudentKey == null){
+                        helpBuildTable(mySnap.className, mySnap.teacher, Classkey);
+                    }
+                    
+                    // build the current class list
+                    if(myStudentKey != null){
+                        var Studentkey = "students/"+myStudentKey;
+                        helpBuildStudentEnrolledTable(mySnap.className, mySnap.teacher, Classkey, Studentkey);
+                    }
+                    
+                    // build the current teacher list based off the currents users email
+                    //  only show the teacher their class list
+                    if(mySnap.email == myEmail){
+                        helpBuildTeacherTable(mySnap.className, mySnap.teacher, mySnap.email, Classkey);
 
-            
-        });
+                    }
+            });
         }
                 
         
@@ -97,17 +98,6 @@
                     ////document.getElementById('sign-in-status').textContent = 'Signed in';
                     //document.getElementById('sign-in').textContent = 'Sign out';      
 
-                    var _userInfo = JSON.stringify({
-                        displayName: displayName,
-                        email: email,
-                        emailVerified: emailVerified,
-                        phoneNumber: phoneNumber,
-                        photoURL: photoURL,
-                        uid: uid,
-                        accessToken: accessToken,
-                        providerData: providerData
-                    }, null, '  ');
-
                     // render the user screen with login information                  
                     userHandler(displayName, email);
                      
@@ -129,7 +119,7 @@
                 initApp()
             });
 
-            function addRowFireBase(MydisplayName, myClass, myEmail){
+            function addRowFireBase(MydisplayName, myClass, myEmail, ){
 
                 classRoot.push().set({
                 teacher: MydisplayName,
@@ -161,6 +151,8 @@
             }
             
             var myLocation = null;
+            var myLat = null;
+            var myLong = null;
 
             /*****
             *  get the teacher gps location
@@ -182,10 +174,9 @@
             
             function showPosition(position) {
                 console.log("in showPosition");
-                myLocation  = "latitude: " +  position.coords.latitude
-                +
-                " Longitude: " + position.coords.longitude; 
-                console.log(myLocation);
+                myLat  = position.coords.latitude;
+                myLong = position.coords.longitude; 
+                
             }
 
             /*****
@@ -200,15 +191,16 @@
                 var myTime = new Date().toLocaleString();
 
 
-                console.log("in add sessions " + myLocation);
+                //console.log("in add sessions " + myLocation);
 
                 // Have to push child session before it it created in firebase
                 var nameRef = root.child(myRef);
                 var nameRef = nameRef.child("sessions");
-                console.log(nameRef);
-                // toDo: pass the teachers current gps location
+                //console.log(nameRef);
+                
                 nameRef.push().set({
-                    location: myLocation,
+                    lat: myLat,
+                    long: myLong,
                     totalAttendees: "0",
                     date: myTime
 
@@ -217,13 +209,14 @@
 
             /*****
              * check in the current current student into the most recent session
-             * toDo:
              *     check to see if the class has a session
              *          get the last session (most current) limitToLast(1)
              *              compare myLocation to teachers session location
              *              
              */
-            function checkIn(myClassRef){
+            function checkIn(myClassRef, myStudentKey){
+
+                console.log(myClassRef + " my student key "+ myStudentKey);
 
                 root.child(myClassRef).child("sessions").limitToLast(1).on("value", function(snapshot){
                     
@@ -240,9 +233,19 @@
                             
                             //session found then compare teacher and student gps locations 
                             if(mySnap != null){
-                                if(myLocation === mySnap.location){
-                                    console.log(myLocation + ' ' +
-                                    mySnap.location);
+                                
+
+                                if(((myLat - mySnap.lat < .000000001)|| (mySnap.lat - myLat  < .000000001))&&
+                                    ((myLong - mySnap.long < .000000001)|| (mySnap.long - myLong  < .000000001))){
+                                    
+                                    //push the current student and class the key checkIn 
+                                    //  value: true
+                                    console.log("Calling update check in if gps locations match");
+                                    console.log(mySnap.lat + ' ' +
+                                    mySnap.long);
+
+                                    updateCheckIn(myClassRef, myStudentKey);
+
                                 } 
                             
                             }
@@ -251,10 +254,35 @@
                     }
                 });
                 
-
-
-
             }
+
+            /*
+            * Update the current student checkIn if there location matches
+            */
+           function updateCheckIn(myRoot, myStudentKey){
+
+               /**
+                    get the current class reference from the root 
+                */
+                var nameRef = root.child(myRoot);
+
+                /****
+                * push students to student class node
+                *  Have to update child students 
+                ******/
+                var studentRef = nameRef.child(myStudentKey);
+
+                /*
+                * Update the check in the student
+                */
+                studentRef.update({
+                    
+                    checkedIn: "True"
+
+                });
+
+           }
+
 
 
             /****
@@ -266,7 +294,7 @@
             function findStudentInClass(myClassRef){
                 //console.log("IN FIND");
                 //console.log(myClassRef);
-                turn = false;
+                turn = null;
 
                 root.child(myClassRef).child("students").orderByChild('name').equalTo(myName).on("child_added", function(snapshot){
                     
@@ -274,8 +302,8 @@
                     var mySnap =snapshot.val();
                     //console.log("FIND STUDENTS");
                     if(mySnap != null){
-                        //console.log(mySnap);
-                        turn = true;
+                        console.log(snapshot.key);
+                        turn = snapshot.key;
                     }
      
                 });
@@ -305,15 +333,14 @@
                 console.log(studentRef);
                 
                 /*
-                * Pass the current users emal, name to the class student list
+                * Pass the current users email, name, and checkIn status to the class student list
                 */
                 studentRef.push().set({
                     name: myName,
-                    email: myEmail
+                    email: myEmail,
+                    checkedIn: "False"
 
                 });
-
-                
             }
             
             
@@ -333,9 +360,9 @@
             * Build the checkin table using the firebase data where currentUser is in the class
             *
             *******/
-            function helpBuildStudentEnrolledTable(className, email, Classkey){
+            function helpBuildStudentEnrolledTable(className, email, Classkey, StudentKey){
 
-                var tmp = "<input type= \"submit\" value=\"checkIn\" onclick=\"checkIn('"+ Classkey + "')\"/>";
+                var tmp = "<input type= \"submit\" value=\"checkIn\" onclick=\"checkIn('"+ Classkey + "', '"+ StudentKey + "')\"/>";
 
                 document.getElementById("studentCurrentClassTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
                     email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
