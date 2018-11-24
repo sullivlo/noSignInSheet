@@ -43,7 +43,7 @@
 
             var myKey  = snapshot.key;
             //console.log("myKey "+ myKey);
-            //console.log(mySnap);
+            
 
             var Classkey = "classes/"+myKey
             
@@ -56,9 +56,15 @@
             if(findStudentInClass(Classkey)){
                 helpBuildStudentEnrolledTable(mySnap.className, mySnap.teacher, Classkey);
             }
+            
+            // build the current teacher list based off the currents users email
+            //  only show the teacher their class list
+            if(mySnap.email == myEmail){
+                helpBuildTeacherTable(mySnap.className, mySnap.teacher, mySnap.email, Classkey);
 
-            helpBuildTeacherTable(mySnap.className, mySnap.teacher, mySnap.email, Classkey);
-         
+            }
+
+            
         });
         }
                 
@@ -129,8 +135,6 @@
                 teacher: MydisplayName,
                 className: myClass,
                 email: myEmail
-
-                
                 });  
             }
 
@@ -210,7 +214,18 @@
 
                 });
             }
-            
+
+            /*****
+             * check in the current current student into the most recent session
+             * toDo:
+             */
+            function checkIn(myClassKey){
+                alert(myClassKey);
+
+
+            }
+
+
             /****
              * Find the current student user in firebase displace them in the 
              *     current table if myChildRef == students and myChildName == name
@@ -226,9 +241,9 @@
                     
                     
                     var mySnap =snapshot.val();
-                    console.log("FIND STUDENTS");
+                    //console.log("FIND STUDENTS");
                     if(mySnap != null){
-                        console.log(mySnap);
+                        //console.log(mySnap);
                         turn = true;
                     }
      
@@ -289,7 +304,7 @@
             *******/
             function helpBuildStudentEnrolledTable(className, email, Classkey){
 
-                var tmp = "<input type= \"submit\" value=\"checkIn\" onclick=\"addStudent('"+ Classkey + "')\"/>";
+                var tmp = "<input type= \"submit\" value=\"checkIn\" onclick=\"checkIn('"+ Classkey + "')\"/>";
 
                 document.getElementById("studentCurrentClassTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
                     email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
