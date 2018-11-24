@@ -170,7 +170,7 @@
             
             function showPosition(position) {
                 console.log("in showPosition");
-                myLocation  = " latitude: " +  position.coords.latitude
+                myLocation  = "latitude: " +  position.coords.latitude
                 +
                 " Longitude: " + position.coords.longitude; 
                 console.log(myLocation);
@@ -197,13 +197,29 @@
                 // toDo: pass the teachers current gps location
                 nameRef.push().set({
                     location: myLocation,
-                    students: "Louis Sullivan",
                     totalAttendees: "0",
                     date: myTime
 
                 });
             }
-
+            
+            /****
+             * Find the current student user in firebase displace them in the 
+             *     current table
+             *     
+             */
+            
+            function findStudentInClass(){
+                root.child('classes').child('students').orderByChild('name').equalTo(myName).on("value", function(snapshot) {
+                console.log(snapshot.val());
+                snapshot.forEach(function(data) {
+                    console.log("FIND STUDENTS");
+                    console.log(data.key);
+                    });
+                });
+            }
+            
+            
             /*******
             * allows the student to add them selves to a class
             * to call this function 
@@ -246,7 +262,7 @@
 
                 var tmp = "<input type= \"submit\" value=\"Add my self to class\" onclick=\"addStudent('"+ Classkey + "')\"/>";
             
-                document.getElementById("myTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
+                document.getElementById("studentTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
                     email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
             }
             
@@ -329,9 +345,11 @@
         <div id = "showStudent" style="display: none">
             <h4>You are a student, save the world from the sign in sheet</h4>
             <br><br>
-            <table id = myTable>
+            <table id = studentTable>
                 <tr><th>Class Name</th><th>Teacher Name</th><th>Class Key</th></tr>
             </table>
+            <input type="submit" value="addClass" onclick="findStudentInClass()">
+          
         </div>
 
         <!-- visible to the teacher-->
