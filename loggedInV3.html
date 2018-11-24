@@ -39,19 +39,34 @@
 
             classRoot.on("child_added", function(snapshot){
 
-            var mySnap =snapshot.val();
+                    var mySnap =snapshot.val();
 
-            var myKey  = snapshot.key;
-            console.log("myKey "+ myKey);
-            console.log(mySnap);
+                    var myKey  = snapshot.key;
+                    //console.log("myKey "+ myKey);
+                    
 
-            var Classkey = "classes/"+myKey
+                    var Classkey = "classes/"+myKey
+                    
+                    var myStudentKey =  findStudentInClass(Classkey);
 
-            helpBuildTable(mySnap.className, mySnap.teacher, Classkey);
+                    // build the class list that the student is not in
+                    if(myStudentKey == null){
+                        helpBuildTable(mySnap.className, mySnap.teacher, Classkey);
+                    }
+                    
+                    // build the current class list
+                    if(myStudentKey != null){
+                        var Studentkey = "students/"+myStudentKey;
+                        helpBuildStudentEnrolledTable(mySnap.className, mySnap.teacher, Classkey, Studentkey);
+                    }
+                    
+                    // build the current teacher list based off the currents users email
+                    //  only show the teacher their class list
+                    if(mySnap.email == myEmail){
+                        helpBuildTeacherTable(mySnap.className, mySnap.teacher, mySnap.email, Classkey);
 
-            helpBuildTeacherTable(mySnap.className, mySnap.teacher, mySnap.email, Classkey);
-         
-        });
+                    }
+            });
         }
                 
         
@@ -83,17 +98,6 @@
                     ////document.getElementById('sign-in-status').textContent = 'Signed in';
                     //document.getElementById('sign-in').textContent = 'Sign out';      
 
-                    var _userInfo = JSON.stringify({
-                        displayName: displayName,
-                        email: email,
-                        emailVerified: emailVerified,
-                        phoneNumber: phoneNumber,
-                        photoURL: photoURL,
-                        uid: uid,
-                        accessToken: accessToken,
-                        providerData: providerData
-                    }, null, '  ');
-
                     // render the user screen with login information                  
                     userHandler(displayName, email);
                      
@@ -115,14 +119,12 @@
                 initApp()
             });
 
-            function addRowFireBase(MydisplayName, myClass, myEmail){
+            function addRowFireBase(MydisplayName, myClass, myEmail, ){
 
                 classRoot.push().set({
                 teacher: MydisplayName,
                 className: myClass,
                 email: myEmail
-
-                
                 });  
             }
 
@@ -149,6 +151,8 @@
             }
             
             var myLocation = null;
+            var myLat = null;
+            var myLong = null;
 
             /*****
             *  get the teacher gps location
@@ -170,10 +174,9 @@
             
             function showPosition(position) {
                 console.log("in showPosition");
-                myLocation  = " latitude: " +  position.coords.latitude
-                +
-                " Longitude: " + position.coords.longitude; 
-                console.log(myLocation);
+                myLat  = position.coords.latitude;
+                myLong = position.coords.longitude; 
+                
             }
 
             /*****
@@ -188,22 +191,126 @@
                 var myTime = new Date().toLocaleString();
 
 
-                console.log("in add sessions " + myLocation);
+                //console.log("in add sessions " + myLocation);
 
                 // Have to push child session before it it created in firebase
                 var nameRef = root.child(myRef);
                 var nameRef = nameRef.child("sessions");
-                console.log(nameRef);
-                // toDo: pass the teachers current gps location
+                //console.log(nameRef);
+                
                 nameRef.push().set({
-                    location: myLocation,
-                    students: "Louis Sullivan",
+                    lat: myLat,
+                    long: myLong,
                     totalAttendees: "0",
                     date: myTime
 
                 });
             }
 
+            /*****
+             * check in the current current student into the most recent session
+             *     check to see if the class has a session
+             *          get the last session (most current) limitToLast(1)
+             *              compare myLocation to teachers session location
+             *              
+             */
+            function checkIn(myClassRef, myStudentKey){
+
+                console.log(myClassRef + " my student key "+ myStudentKey);
+
+                root.child(myClassRef).child("sessions").limitToLast(1).on("value", function(snapshot){
+                    
+                    //console.log("FIND session");
+                    if(snapshot.val() == null){
+                        alert("Teacher must recreate a session before you can check in");
+                    }
+
+                    if(snapshot.val() != null){
+                    
+                        snapshot.forEach(childSnap => {
+                            
+                            var mySnap =childSnap.val();
+                            
+                            //session found then compare teacher and student gps locations 
+                            if(mySnap != null){
+                                
+
+                                if(((myLat - mySnap.lat < .000000001)|| (mySnap.lat - myLat  < .000000001))&&
+                                    ((myLong - mySnap.long < .000000001)|| (mySnap.long - myLong  < .000000001))){
+                                    
+                                    //push the current student and class the key checkIn 
+                                    //  value: true
+                                    console.log("Calling update check in if gps locations match");
+                                    console.log(mySnap.lat + ' ' +
+                                    mySnap.long);
+
+                                    updateCheckIn(myClassRef, myStudentKey);
+
+                                } 
+                            
+                            }
+                        
+                        });
+                    }
+                });
+                
+            }
+
+            /*
+            * Update the current student checkIn if there location matches
+            */
+           function updateCheckIn(myRoot, myStudentKey){
+
+               /**
+                    get the current class reference from the root 
+                */
+                var nameRef = root.child(myRoot);
+
+                /****
+                * push students to student class node
+                *  Have to update child students 
+                ******/
+                var studentRef = nameRef.child(myStudentKey);
+
+                /*
+                * Update the check in the student
+                */
+                studentRef.update({
+                    
+                    checkedIn: "True"
+
+                });
+
+           }
+
+
+
+            /****
+             * Find the current student user in firebase displace them in the 
+             *     current table if myChildRef == students and myChildName == name
+             * 
+             */
+            
+            function findStudentInClass(myClassRef){
+                //console.log("IN FIND");
+                //console.log(myClassRef);
+                turn = null;
+
+                root.child(myClassRef).child("students").orderByChild('name').equalTo(myName).on("child_added", function(snapshot){
+                    
+                    
+                    var mySnap =snapshot.val();
+                    //console.log("FIND STUDENTS");
+                    if(mySnap != null){
+                        console.log(snapshot.key);
+                        turn = snapshot.key;
+                    }
+     
+                });
+                return turn;
+            }
+            
+            
             /*******
             * allows the student to add them selves to a class
             * to call this function 
@@ -226,30 +333,41 @@
                 console.log(studentRef);
                 
                 /*
-                * Pass the current users emal, name to the class student list
+                * Pass the current users email, name, and checkIn status to the class student list
                 */
                 studentRef.push().set({
                     name: myName,
-                    email: myEmail
+                    email: myEmail,
+                    checkedIn: "False"
 
                 });
-
-                
             }
             
             
             /*****
-            * Build the table using the firebase data
+            * Build the enrollment to class table using the firebase data
             *
             *******/
             function helpBuildTable(className, email, Classkey){
 
                 var tmp = "<input type= \"submit\" value=\"Add my self to class\" onclick=\"addStudent('"+ Classkey + "')\"/>";
             
-                document.getElementById("myTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
+                document.getElementById("studentTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
                     email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
             }
             
+            /*****
+            * Build the checkin table using the firebase data where currentUser is in the class
+            *
+            *******/
+            function helpBuildStudentEnrolledTable(className, email, Classkey, StudentKey){
+
+                var tmp = "<input type= \"submit\" value=\"checkIn\" onclick=\"checkIn('"+ Classkey + "', '"+ StudentKey + "')\"/>";
+
+                document.getElementById("studentCurrentClassTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
+                    email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
+            }
+
             /*****
             * Build the teacher table using the firebase data
             *
@@ -279,34 +397,6 @@
                 document.getElementById("Submit").style.display = 'none';  
             }
             
-
-
-            function searchFireBaseForStudent(myRoot){
-                //var tableString = document.getElementById("searchTable").value.toLowerCase();;
-                var Mycount =0;
-
-                 /**
-                    get the current class reference from the root 
-                */
-                var nameRef = root.child(myRoot);
-                
-                /****
-                * push students to current class node
-                *  Have to push child students before it it created in firebase
-                ******/
-                var studentRef = nameRef.child("students");
-
-                studentRef.once("value").then(function (snapshot){
-                    snapshot.forEach(function(childSnapshot) {
-                        var MyName = childSnapshot.val().name;
-                        
-                        console.log("Your name was found");
-                         
-                            
-                        });
-                });
-                                
-            }
         </script>
     
     
@@ -328,10 +418,19 @@
         <!-- visible to the student-->
         <div id = "showStudent" style="display: none">
             <h4>You are a student, save the world from the sign in sheet</h4>
-            <br><br>
-            <table id = myTable>
+            <br>
+            <h3>Enroll in a class</h3>
+            <br>
+            <table id = studentTable>
                 <tr><th>Class Name</th><th>Teacher Name</th><th>Class Key</th></tr>
             </table>
+            <br><br>
+            <h3>classes you are enrolled</h3>
+            <br>
+            <table id = studentCurrentClassTable>
+                <tr><th>Class Name</th><th>Teacher Name</th><th>Class Key</th></tr>
+            </table>
+    
         </div>
 
         <!-- visible to the teacher-->
