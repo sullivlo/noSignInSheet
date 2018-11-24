@@ -47,12 +47,15 @@
 
             var Classkey = "classes/"+myKey
             
+            // build the class list that the student is not in
             if(!findStudentInClass(Classkey)){
                 helpBuildTable(mySnap.className, mySnap.teacher, Classkey);
             }
             
-            
-            
+            // build the current class list
+            if(findStudentInClass(Classkey)){
+                helpBuildStudentEnrolledTable(mySnap.className, mySnap.teacher, Classkey);
+            }
 
             helpBuildTeacherTable(mySnap.className, mySnap.teacher, mySnap.email, Classkey);
          
@@ -219,7 +222,7 @@
                 //console.log(myClassRef);
                 turn = false;
 
-                root.child(myClassRef).child("students").orderByChild('name').equalTo(myName).once("value", function(snapshot){
+                root.child(myClassRef).child("students").orderByChild('name').equalTo(myName).on("child_added", function(snapshot){
                     
                     
                     var mySnap =snapshot.val();
@@ -269,7 +272,7 @@
             
             
             /*****
-            * Build the table using the firebase data
+            * Build the enrollment to class table using the firebase data
             *
             *******/
             function helpBuildTable(className, email, Classkey){
@@ -280,6 +283,20 @@
                     email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
             }
             
+            /*****
+            * Build the checkin table using the firebase data where currentUser is in the class
+            *
+            *******/
+            function helpBuildStudentEnrolledTable(className, email, Classkey){
+
+                var tmp = "<input type= \"submit\" value=\"checkIn\" onclick=\"addStudent('"+ Classkey + "')\"/>";
+
+                document.getElementById("studentCurrentClassTable").innerHTML += "<tr id = "+ Classkey + " ><td>" + className + "</td><td>" +
+                    email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
+            }
+
+
+
             /*****
             * Build the teacher table using the firebase data
             *
@@ -309,34 +326,6 @@
                 document.getElementById("Submit").style.display = 'none';  
             }
             
-
-
-            function searchFireBaseForStudent(myRoot){
-                //var tableString = document.getElementById("searchTable").value.toLowerCase();;
-                var Mycount =0;
-
-                 /**
-                    get the current class reference from the root 
-                */
-                var nameRef = root.child(myRoot);
-                
-                /****
-                * push students to current class node
-                *  Have to push child students before it it created in firebase
-                ******/
-                var studentRef = nameRef.child("students");
-
-                studentRef.once("value").then(function (snapshot){
-                    snapshot.forEach(function(childSnapshot) {
-                        var MyName = childSnapshot.val().name;
-                        
-                        console.log("Your name was found");
-                         
-                            
-                        });
-                });
-                                
-            }
         </script>
     
     
@@ -358,11 +347,20 @@
         <!-- visible to the student-->
         <div id = "showStudent" style="display: none">
             <h4>You are a student, save the world from the sign in sheet</h4>
-            <br><br>
+            <br>
+            <h3>Enroll in a class</h3>
+            <br>
             <table id = studentTable>
                 <tr><th>Class Name</th><th>Teacher Name</th><th>Class Key</th></tr>
             </table>
-            <input type="submit" value="addClass" onclick="findStudentInClass()">
+            <br><br>
+            <h3>classes you are enrolled</h3>
+            <br>
+            <table id = studentCurrentClassTable>
+                <tr><th>Class Name</th><th>Teacher Name</th><th>Class Key</th></tr>
+            </table>
+            
+            
           
         </div>
 
