@@ -42,12 +42,17 @@
             var mySnap =snapshot.val();
 
             var myKey  = snapshot.key;
-            console.log("myKey "+ myKey);
-            console.log(mySnap);
+            //console.log("myKey "+ myKey);
+            //console.log(mySnap);
 
             var Classkey = "classes/"+myKey
-
-            helpBuildTable(mySnap.className, mySnap.teacher, Classkey);
+            
+            if(!findStudentInClass(Classkey)){
+                helpBuildTable(mySnap.className, mySnap.teacher, Classkey);
+            }
+            
+            
+            
 
             helpBuildTeacherTable(mySnap.className, mySnap.teacher, mySnap.email, Classkey);
          
@@ -205,18 +210,27 @@
             
             /****
              * Find the current student user in firebase displace them in the 
-             *     current table
-             *     
+             *     current table if myChildRef == students and myChildName == name
+             * 
              */
             
-            function findStudentInClass(){
-                root.child('classes').child('students').orderByChild('name').equalTo(myName).on("value", function(snapshot) {
-                console.log(snapshot.val());
-                snapshot.forEach(function(data) {
+            function findStudentInClass(myClassRef){
+                //console.log("IN FIND");
+                //console.log(myClassRef);
+                turn = false;
+
+                root.child(myClassRef).child("students").orderByChild('name').equalTo(myName).once("value", function(snapshot){
+                    
+                    
+                    var mySnap =snapshot.val();
                     console.log("FIND STUDENTS");
-                    console.log(data.key);
-                    });
+                    if(mySnap != null){
+                        console.log(mySnap);
+                        turn = true;
+                    }
+     
                 });
+                return turn;
             }
             
             
