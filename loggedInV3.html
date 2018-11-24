@@ -218,9 +218,40 @@
             /*****
              * check in the current current student into the most recent session
              * toDo:
+             *     check to see if the class has a session
+             *          get the last session (most current) limitToLast(1)
+             *              compare myLocation to teachers session location
+             *              
              */
-            function checkIn(myClassKey){
-                alert(myClassKey);
+            function checkIn(myClassRef){
+
+                root.child(myClassRef).child("sessions").limitToLast(1).on("value", function(snapshot){
+                    
+                    //console.log("FIND session");
+                    if(snapshot.val() == null){
+                        alert("Teacher must recreate a session before you can check in");
+                    }
+
+                    if(snapshot.val() != null){
+                    
+                        snapshot.forEach(childSnap => {
+                            
+                            var mySnap =childSnap.val();
+                            
+                            //session found then compare teacher and student gps locations 
+                            if(mySnap != null){
+                                if(myLocation === mySnap.location){
+                                    console.log(myLocation + ' ' +
+                                    mySnap.location);
+                                } 
+                            
+                            }
+                        
+                        });
+                    }
+                });
+                
+
 
 
             }
@@ -310,8 +341,6 @@
                     email + "</td>"+ "<td>" + tmp + "</td>" +"</tr>";
             }
 
-
-
             /*****
             * Build the teacher table using the firebase data
             *
@@ -374,9 +403,7 @@
             <table id = studentCurrentClassTable>
                 <tr><th>Class Name</th><th>Teacher Name</th><th>Class Key</th></tr>
             </table>
-            
-            
-          
+    
         </div>
 
         <!-- visible to the teacher-->
