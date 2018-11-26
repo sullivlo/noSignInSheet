@@ -6,13 +6,12 @@
 import firebase from "firebase";
 import firebaseui from "firebaseui";
 import { config } from "../firebaseConfig";
-import base from "../../vue.config.js"
 
 export default {
   name: "auth",
   mounted() {
     var uiConfig = {
-      signInSuccessUrl: base.baseUrl,
+      signInSuccessUrl: this.$baseUrl,
       signInOptions: [
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         firebase.auth.EmailAuthProvider.PROVIDER_ID
