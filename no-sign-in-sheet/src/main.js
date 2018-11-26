@@ -1,14 +1,18 @@
 import Vue from "vue";
+import Vuex from "vuex";
 import "./plugins/vuetify";
 import App from "./App.vue";
 import router from "./router";
 import firebase from "firebase";
+import store from './store'
 
 
 Vue.config.productionTip = false;
+Vue.use(Vuex);
 
 new Vue({
   router,
+  store,
   created() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
