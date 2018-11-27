@@ -5,13 +5,13 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    uname: "",
-    email: ""
+    uname: null,
+    email: null
   },
   mutations: {
-    login(name, email) {
-      this.state.uname = name;
-      this.state.email = email;
+    login(state, payload) {
+      state.uname = payload.name;
+      state.email = payload.email;
     }
   },
   actions: {}

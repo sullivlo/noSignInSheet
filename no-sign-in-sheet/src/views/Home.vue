@@ -12,12 +12,15 @@
 
 <script>
 import firebase from "firebase";
-import store from "../store.js";
 export default {
   name: "App",
   created: function() {
-    this.$store.commit('login', firebase.auth().currentUser.displayName, firebase.auth().currentUser.email);
-    console.log(this.$store.uname);
+    var user = firebase.auth().currentUser; 
+    // notice that a Vuex mutation cannot contain more than 1 payload parameter.
+    this.$store.commit('login', { name: user.displayName, email: user.email});
+    console.log(this.$store.state.uname);
+    console.log(this.$store.state.email);
+
   },
   data() {
     return {
