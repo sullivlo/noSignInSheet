@@ -9,7 +9,7 @@
           <td>{{ props.item.className }}</td>
           <td>{{ props.item.teacher }}</td>
           <td>
-            <v-btn @click="launchSession(props.item['.key'])">New Session</v-btn>
+            <v-btn @click="addStudent(props.item['.key'])">Add myself to class</v-btn>
           </td>
         </template>
       </v-data-table>
@@ -34,6 +34,7 @@ export default {
       classes: firebase.database().ref("classes")
     };
   },
+
   methods: {
     addClass(name) {
       // Add a new document in collection "cities"
@@ -53,7 +54,7 @@ export default {
           console.error("Error writing document: ", error);
         });
     },
-    launchSession(id) {
+    addStudent(id) {
       console.log(id);
       var myTime = new Date().toLocaleString();
       firebase
@@ -61,16 +62,16 @@ export default {
         .ref()
         .child("classes")
         .child(id)
-        .child("sessions")
+        .child("students")
         .push()
         .set({
-          lat: this.$store.state.myLat,
-          long: this.$store.state.myLong,
-          totalAttendees: "0",
-          date: myTime
+          email: this.$store.state.email,
+          name: this.$store.state.uname
         });
     }
-  }
+  },
+  //life cycle diagram
+  beforeMount() {}
 };
 </script>
 
