@@ -1,9 +1,28 @@
 <template>
   <v-container>
     <v-layout row justify-center pb-4>
-      <v-card>
+      <v-card dark>
         <v-card-title>
-          <h2>My Classes</h2>
+          <h2>My Classes
+            <v-dialog v-model="dialog" width="500">
+              <v-icon slot="activator" @click="showAddClass()">add</v-icon>
+
+              <v-card>
+                <v-card-title class="headline grey lighten-2" primary-title>Create New Class</v-card-title>
+
+                <v-card-text>Enter Name:
+                  <v-text-field v-model="cName" placeholder="Class Name"/>
+                </v-card-text>
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" flat @click="dialog = false">Cancel</v-btn>
+                  <v-btn color="primary" flat @click="dialog = false, addClass(cName)">Create</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </h2>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -38,12 +57,6 @@
         </v-data-table>
       </v-card>
     </v-layout>
-    <v-layout row justify-center>
-      <form @submit="addClass(cName)">
-        <v-text-field v-model="cName" placeholder="Class Name"/>
-        <v-btn type="submit">Create New Class</v-btn>
-      </form>
-    </v-layout>
   </v-container>
 </template>
 
@@ -59,6 +72,7 @@ export default {
     ],
     classes: [],
     cName: null,
+    dialog: null,
     search: ""
   }),
   firebase() {
@@ -85,7 +99,9 @@ export default {
           sessions: [],
           students: []
         });
+      this.cName = "";
     },
+    showAddClass() {},
     launchSession(id) {
       console.log(id);
       var myTime = new Date().toLocaleString();
