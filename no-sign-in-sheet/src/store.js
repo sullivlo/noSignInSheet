@@ -8,6 +8,8 @@ export default new Vuex.Store({
     uname: null,
     email: null,
     rootRef: null,
+    myLat: null,
+    myLong: null,
     classRoot: null
   },
   mutations: {
@@ -18,6 +20,10 @@ export default new Vuex.Store({
     dbSetup(state, payload) {
       state.rootRef = payload.root;
       state.classRoot = payload.class;
+    },
+    location(state, payload) {
+      state.myLat = payload.lat;
+      state.myLong = payload.long;
     }
   },
   actions: {}

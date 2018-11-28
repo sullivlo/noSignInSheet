@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-layout row>
-        <h1>Log-out Successful</h1>
+      <h1>Log-out Successful</h1>
     </v-layout>
   </v-container>
 </template>
