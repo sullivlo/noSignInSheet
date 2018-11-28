@@ -1,20 +1,18 @@
 <template>
-  <v-container grid-list-md text-xs-center>
-    <v-layout row wrap>
-      <v-flex xs12>
-        <h1>Student View</h1>
-      </v-flex>
-      <v-flex>
-        <v-data-table :headers="this.headers" :items="classes" class="elevation-1">
-          <template slot="items" slot-scope="props">
-            <td>{{ props.item.className }}</td>
-            <td>{{ props.item.teacher }}</td>
-            <td>
-              <v-btn @click="launchSession(props.item['.key'])">New Session</v-btn>
-            </td>
-          </template>
-        </v-data-table>
-      </v-flex>
+  <v-container>
+    <v-layout row justify-center pb-4>
+      <h1>Student View</h1>
+    </v-layout>
+    <v-layout row justify-center pb-4>
+      <v-data-table :headers="this.headers" :items="classes" class="elevation-1">
+        <template slot="items" slot-scope="props">
+          <td>{{ props.item.className }}</td>
+          <td>{{ props.item.teacher }}</td>
+          <td>
+            <v-btn @click="launchSession(props.item['.key'])">New Session</v-btn>
+          </td>
+        </template>
+      </v-data-table>
     </v-layout>
   </v-container>
 </template>

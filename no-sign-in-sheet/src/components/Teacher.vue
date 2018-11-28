@@ -1,6 +1,9 @@
 <template>
   <v-container>
     <v-layout row justify-center pb-4>
+      <h1>Teacher View</h1>
+    </v-layout>
+    <v-layout row justify-center pb-4>
       <v-data-table :headers="this.headers" :items="classes" class="elevation-1">
         <template slot="items" slot-scope="props">
           <td>{{ props.item.className }}</td>
