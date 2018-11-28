@@ -8,10 +8,10 @@
     <v-layout row>
       <v-data-table :headers="this.headers" :items="classes" class="elevation-1">
         <template slot="items" slot-scope="props">
-          <td>{{ props.item.name }}</td>
+          <td>{{ props.item.className }}</td>
           <td>{{ props.item.teacher }}</td>
           <td>
-            <v-btn>Launch Session</v-btn>
+            <v-btn @click="launchSession(props.item['.key'])">New Session</v-btn>
           </td>
         </template>
       </v-data-table>
@@ -48,6 +48,7 @@ export default {
         .ref()
         .child("classes")
     });
+    this.getLocation();
   },
   data() {
     return {
@@ -59,12 +60,14 @@ export default {
       uname: "",
       classes: [],
       cName: null,
+      myLat: null,
+      myLong: null,
       rootRef: null
     };
   },
-  firestore() {
+  firebase() {
     return {
-      classes: firebase.firestore().collection("classes")
+      classes: firebase.database().ref("classes")
     };
   },
   methods: {
@@ -84,6 +87,41 @@ export default {
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
+        });
+    },
+    /*****
+     *  get the gps location
+     *
+     *****/
+    getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(this.showPosition);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    },
+    /*****
+     *  record the gps location
+     *****/
+    showPosition(position) {
+      this.myLat = position.coords.latitude;
+      this.myLong = position.coords.longitude;
+    },
+    launchSession(id) {
+      console.log(id);
+      var myTime = new Date().toLocaleString();
+      firebase
+        .database()
+        .ref()
+        .child("classes")
+        .child(id)
+        .child("sessions")
+        .push()
+        .set({
+          lat: this.myLat,
+          long: this.myLong,
+          totalAttendees: "0",
+          date: myTime
         });
     }
   }
