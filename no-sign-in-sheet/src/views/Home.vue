@@ -3,15 +3,26 @@
     <v-layout row>
       <v-label>
         <h1>{{ this.$store.state.uname }}'s Home</h1>
-        <v-data-table :headers="headers" :items="classes" class="elevation-1">
-          <template slot="classTable" slot-scope="props">
-            <td>{{ props.item.name }}</td>
-            <td class="text-xs-right">{{ props.item.className }}</td>
-            <td class="text-xs-right">{{ props.item.teacher }}</td>
-            <td class="text-xs-right">{{ props.item.key }}</td>
-          </template>
-        </v-data-table>
       </v-label>
+    </v-layout>
+    <v-layout row>
+      <v-data-table :headers="this.headers" :items="classes" class="elevation-1">
+        <template slot="items" slot-scope="props">
+          <td>{{ props.item.name }}</td>
+          <td>{{ props.item.teacher }}</td>
+          <td>
+            <v-btn>Launch Session</v-btn>
+          </td>
+        </template>
+      </v-data-table>
+    </v-layout>
+    <v-layout row>
+      <v-flex>
+        <form @submit="addClass(cName)">
+          <input v-model="cName" placeholder="Class Name">
+          <button type="submit">Create New Class</button>
+        </form>
+      </v-flex>
     </v-layout>
   </v-container>
 </template>
@@ -19,15 +30,17 @@
 
 <script>
 import firebase from "firebase";
+//import { db, currentUser } from "../firebaseConfig";
 
 export default {
   name: "App",
   created: function() {
     var user = firebase.auth().currentUser;
     // notice that a Vuex mutation cannot contain more than 1 payload parameter.
-    this.$store.commit("login", { name: user.displayName, email: user.email });
-    console.log(this.$store.state.uname);
-    console.log(this.$store.state.email);
+    this.$store.commit("login", {
+      name: user.displayName,
+      email: user.email
+    });
     this.$store.commit("dbSetup", {
       root: firebase.database().ref(),
       class: firebase
@@ -40,15 +53,40 @@ export default {
     return {
       headers: [
         { text: "Class", value: "class" },
-        { text: "Student", value: "student" },
+        { text: "Teacher", value: "student" },
         { text: "Key", value: "key" }
       ],
       uname: "",
-      classes: firebase.database().ref("classes"),
+      classes: [],
+      cName: null,
       rootRef: null
     };
   },
-  methods: {}
+  firestore() {
+    return {
+      classes: firebase.firestore().collection("classes")
+    };
+  },
+  methods: {
+    addClass(name) {
+      // Add a new document in collection "cities"
+      firebase
+        .firestore()
+        .collection("classes")
+        .doc()
+        .set({
+          name: name,
+          teacher: this.$store.state.uname,
+          email: this.$store.state.email
+        })
+        .then(function() {
+          console.log("Document successfully written!");
+        })
+        .catch(function(error) {
+          console.error("Error writing document: ", error);
+        });
+    }
+  }
 };
 </script>
 

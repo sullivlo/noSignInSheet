@@ -13,7 +13,6 @@ Vue.config.productionTip = false;
 Vue.use(Vuex);
 Vue.use(VueFire);
 
-
 new Vue({
   router,
   store,
