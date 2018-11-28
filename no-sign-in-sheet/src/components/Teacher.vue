@@ -1,18 +1,42 @@
 <template>
   <v-container>
     <v-layout row justify-center pb-4>
-      <h1>Teacher View</h1>
-    </v-layout>
-    <v-layout row justify-center pb-4>
-      <v-data-table :headers="this.headers" :items="classes" class="elevation-1">
-        <template slot="items" slot-scope="props">
-          <td>{{ props.item.className }}</td>
-          <td>{{ props.item.teacher }}</td>
-          <td>
-            <v-btn @click="launchSession(props.item['.key'])">New Session</v-btn>
-          </td>
-        </template>
-      </v-data-table>
+      <v-card>
+        <v-card-title>
+          <h2>My Classes</h2>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="search"
+            append-icon="search"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
+        </v-card-title>
+
+        <v-data-table
+          :headers="this.headers"
+          :items="classes"
+          :search="search"
+          class="elevation-1"
+          dark
+          :rows-per-page-items="[ 7, 10, 15, { text: 'All', value: -1 } ]"
+        >
+          <template slot="items" slot-scope="props">
+            <td>{{ props.item.name }}</td>
+            <td>{{ props.item.teacher }}</td>
+            <td>
+              <v-btn @click="launchSession(props.item['.key'])">New Session</v-btn>
+            </td>
+          </template>
+          <v-alert
+            slot="no-results"
+            :value="true"
+            color="error"
+            icon="warning"
+          >Your search for "{{ search }}" found no results.</v-alert>
+        </v-data-table>
+      </v-card>
     </v-layout>
     <v-layout row justify-center>
       <form @submit="addClass(cName)">
@@ -29,35 +53,37 @@ import firebase from "firebase";
 export default {
   data: () => ({
     headers: [
-      { text: "Class", value: "class" },
+      { text: "Class", value: "name" },
       { text: "Teacher", value: "student" },
       { text: "Key", value: "key" }
     ],
     classes: [],
-    cName: null
+    cName: null,
+    search: ""
   }),
   firebase() {
     return {
-      classes: firebase.database().ref("classes")
+      classes: firebase
+        .database()
+        .ref("classes")
+        .orderByChild("email")
+        .equalTo(this.$store.state.email)
     };
   },
   methods: {
     addClass(name) {
       // Add a new document in collection "cities"
       firebase
-        .firestore()
-        .collection("classes")
-        .doc()
+        .database()
+        .ref()
+        .child("classes")
+        .push()
         .set({
           name: name,
           teacher: this.$store.state.uname,
-          email: this.$store.state.email
-        })
-        .then(function() {
-          console.log("Document successfully written!");
-        })
-        .catch(function(error) {
-          console.error("Error writing document: ", error);
+          email: this.$store.state.email,
+          sessions: [],
+          students: []
         });
     },
     launchSession(id) {
