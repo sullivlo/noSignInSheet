@@ -4,6 +4,8 @@ import firebase from "firebase";
 import Home from "./views/Home.vue";
 import Settings from "./views/Settings.vue";
 import Login from "./views/Login.vue";
+import History from "./views/History.vue";
+
 
 Vue.use(Router);
 
@@ -27,6 +29,15 @@ const router = new Router({
       path: "/settings",
       name: "settings",
       component: Settings,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: "/history/:id",
+      name: "history",
+      props: true,
+      component: History,
       meta: {
         requiresAuth: true
       }

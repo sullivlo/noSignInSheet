@@ -45,6 +45,9 @@
             <td>
               <v-btn @click="launchSession(props.item['.key'])">New Session</v-btn>
             </td>
+            <td>
+              <v-btn @click="showHistory(props.item['.key'])">History</v-btn>
+            </td>
           </template>
           <v-alert
             slot="no-results"
@@ -66,7 +69,8 @@ export default {
     headers: [
       { text: "Class", value: "name" },
       { text: "Teacher", value: "student" },
-      { text: "Key", value: "key" }
+      { text: "Launch Session", value: "launch" },
+      { text: "History", value: "history" }
     ],
     classes: [],
     cName: null,
@@ -99,7 +103,10 @@ export default {
         });
       this.cName = "";
     },
-    showAddClass() {},
+    showHistory(id) {
+      //
+      this.$router.push({ name: "history", params: { id: id } });
+    },
     launchSession(id) {
       console.log(id);
       var myTime = new Date().toLocaleString();
