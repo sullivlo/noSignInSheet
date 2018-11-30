@@ -69,6 +69,8 @@ export default {
       console.log(this.allClasses);
       console.log(typeof this.allClasses);
 
+      var tmpMyClasses = [];
+
       for (var numClass in this.allClasses) {
         var currStudent = this.allClasses[numClass].students;
 
@@ -80,20 +82,15 @@ export default {
               console.log("I am in in this class yee haw ");
               console.log(this.allClasses[numClass]);
               //add classes to myClasses
+              tmpMyClasses.push(this.allClasses[numClass]);
             }
           }
         }
       }
 
-      //
-      // Klass.students.each(Stud => {
-      //   //create flag before class loop
-      //   console.log("in loop");
-      //   // if stud.email = this.$store.state.email
-      //   //  then flag = true
-      // });
-      // if flag true then add class to myClass
-      // else add to not my classes
+      console.log(typeof tmpMyClasses);
+      console.log(tmpMyClasses);
+      return { myClasses: tmpMyClasses };
     }
   },
   //life cycle diagram
