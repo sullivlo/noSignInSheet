@@ -144,6 +144,10 @@ export default {
       var myTime = new Date().toLocaleString();
       const e = this.$store.state.email;
       const u = this.$store.state.uname;
+
+      const myLat = this.$store.state.myLat;
+      const myLong = this.$store.state.myLong;
+
       firebase
         .database()
         .ref()
@@ -151,17 +155,47 @@ export default {
         .orderByChild("date")
         .limitToLast(1)
         .once("child_added", function(snapshot) {
-          console.log(snapshot.key);
-          firebase
-            .database()
-            .ref()
-            .child(`classes/${id}/sessions/${snapshot.key}/attendees`)
-            .push()
-            .set({
-              email: e,
-              name: u,
-              present: true
-            });
+          var teacherDate = snapshot.val().date;
+
+          // var teacherDate = teacherDate.split(",");
+          // var tmpTime = myTime.split(",");
+
+          console.log(typeof teacherDate);
+          console.log(typeof myTime);
+
+          var x = new Date(teacherDate);
+          var y = new Date(myTime);
+          console.log(y - x);
+          //check to see if the current time is within an hour of session creation
+          if (y.getTime() - x.getTime() < 3600000) {
+            var teacherLat = snapshot.val().lat;
+            var teacherLong = snapshot.val().long;
+
+            console.log(myLat - teacherLat);
+            console.log(myLong - teacherLong);
+
+            if (
+              (myLat - teacherLat < 0.000000001 ||
+                teacherLat - myLat < 0.000000001) &&
+              (myLong - teacherLong < 0.000000001 ||
+                teacherLong - myLong < 0.000000001)
+            ) {
+              firebase
+                .database()
+                .ref()
+                .child(`classes/${id}/sessions/${snapshot.key}/attendees`)
+                .push()
+                .set({
+                  email: e,
+                  name: u,
+                  present: true
+                });
+            } else {
+              alert("gps loaction does not match the teachers");
+            }
+          } else {
+            alert("teacher created the session more than an hour ago");
+          }
         });
 
       this.createClasses();

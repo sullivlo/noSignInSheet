@@ -36,7 +36,7 @@
           :search="search"
           class="elevation-1"
           dark
-          :rows-per-page-items="[ 7, 10, 15, { text: 'All', value: -1 } ]"
+          :rows-per-page-items="[ 5, 7, 10, 15, { text: 'All', value: -1 } ]"
           pagination.sync="{ rowsPerPage: 7 }"
         >
           <template slot="items" slot-scope="props">
