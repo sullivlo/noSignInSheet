@@ -70,6 +70,7 @@ export default {
       console.log(typeof this.allClasses);
 
       var tmpMyClasses = [];
+      var tmpNotMyClasses = [];
 
       for (var numClass in this.allClasses) {
         var currStudent = this.allClasses[numClass].students;
@@ -79,18 +80,25 @@ export default {
           for (var numStud in currStudent) {
             var strEmail = currStudent[numStud].email;
             if (strEmail == this.$store.state.email) {
-              console.log("I am in in this class yee haw ");
+              console.log("I am in this class yee haw ");
               console.log(this.allClasses[numClass]);
               //add classes to myClasses
               tmpMyClasses.push(this.allClasses[numClass]);
+            } else {
+              console.log("I am not in this class darn it  ");
+              console.log(this.allClasses[numClass]);
+              //add classes to not myClasses
+              tmpNotMyClasses.push(this.allClasses[numClass]);
             }
           }
         }
       }
+      console.log(typeof tmpNotMyClasses);
+      console.log(tmpNotMyClasses);
 
       console.log(typeof tmpMyClasses);
       console.log(tmpMyClasses);
-      return { myClasses: tmpMyClasses };
+      return { myClasses: tmpMyClasses, notClasses: tmpNotMyClasses };
     }
   },
   //life cycle diagram
