@@ -39,6 +39,46 @@
         </v-data-table>
       </v-card>
     </v-layout>
+
+    <v-layout row justify-center pb-4>
+      <v-card dark>
+        <v-card-title>
+          <h2>Check into a class:</h2>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="search"
+            append-icon="search"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
+        </v-card-title>
+        <v-divider dark/>
+        <v-data-table
+          :headers="this.headers"
+          :items="this.myClasses"
+          :search="search"
+          class="elevation-1"
+          dark
+          :rows-per-page-items="[ 5, 7, 10, 15, { text: 'All', value: -1 } ]"
+          pagination.sync="{ rowsPerPage: 7 }"
+        >
+          <template slot="items" slot-scope="props">
+            <td>{{ props.item.name }}</td>
+            <td>{{ props.item.teacher }}</td>
+            <td>
+              <v-btn @click="studentsLookCheckin(props.item['.key'])">Check into class</v-btn>
+            </td>
+          </template>
+          <v-alert
+            slot="no-results"
+            :value="true"
+            color="error"
+            icon="warning"
+          >Your search for "{{ search }}" found no results.</v-alert>
+        </v-data-table>
+      </v-card>
+    </v-layout>
   </v-container>
 </template>
 
@@ -97,6 +137,12 @@ export default {
           name: this.$store.state.uname
         });
       this.createClasses();
+    },
+    studentsLookCheckin(id) {
+      //look if student is checked into current class session
+    },
+    studentsDoCheckin(id) {
+      //add student to current session to class they are in
     },
     createClasses() {
       //find classes not currently entrolled
