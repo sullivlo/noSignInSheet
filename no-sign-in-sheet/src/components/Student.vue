@@ -144,11 +144,13 @@ export default {
       var myTime = new Date().toLocaleString();
       const e = this.$store.state.email;
       const u = this.$store.state.uname;
+      var CheckedInflag = false;
 
       const myLat = this.$store.state.myLat;
       const myLong = this.$store.state.myLong;
 
-      firebase
+      var tmpSession = null;
+      tmpSession = firebase
         .database()
         .ref()
         .child(`classes/${id}/sessions`)
@@ -168,36 +170,53 @@ export default {
           console.log(y - x);
           //check to see if the current time is within an hour of session creation
           if (y.getTime() - x.getTime() < 3600000) {
-            var teacherLat = snapshot.val().lat;
-            var teacherLong = snapshot.val().long;
+            firebase
+              .database()
+              .ref()
+              .child(`classes/${id}/sessions/${snapshot.key}/attendees`)
+              .on("child_added", function(tmpAttends) {
+                if (tmpAttends.val().email == e) {
+                  CheckedInflag = true;
+                }
+              });
 
-            console.log(myLat - teacherLat);
-            console.log(myLong - teacherLong);
+            if (!CheckedInflag) {
+              var teacherLat = snapshot.val().lat;
+              var teacherLong = snapshot.val().long;
 
-            if (
-              (myLat - teacherLat < 0.000000001 ||
-                teacherLat - myLat < 0.000000001) &&
-              (myLong - teacherLong < 0.000000001 ||
-                teacherLong - myLong < 0.000000001)
-            ) {
-              firebase
-                .database()
-                .ref()
-                .child(`classes/${id}/sessions/${snapshot.key}/attendees`)
-                .push()
-                .set({
-                  email: e,
-                  name: u,
-                  present: true
-                });
+              console.log(myLat - teacherLat);
+              console.log(myLong - teacherLong);
+
+              if (
+                (myLat - teacherLat < 0.000000001 ||
+                  teacherLat - myLat < 0.000000001) &&
+                (myLong - teacherLong < 0.000000001 ||
+                  teacherLong - myLong < 0.000000001)
+              ) {
+                firebase
+                  .database()
+                  .ref()
+                  .child(`classes/${id}/sessions/${snapshot.key}/attendees`)
+                  .push()
+                  .set({
+                    email: e,
+                    name: u,
+                    present: true
+                  });
+              } else {
+                alert("gps loaction does not match the teachers");
+              }
             } else {
-              alert("gps loaction does not match the teachers");
+              alert("you are already checked in");
             }
           } else {
             alert("teacher created the session more than an hour ago");
           }
         });
-
+      console.log(tmpSession);
+      for (var tmpSess in tmpSession) {
+        console.log(tmpSession[tmpSess]);
+      }
       this.createClasses();
     },
     createClasses() {
