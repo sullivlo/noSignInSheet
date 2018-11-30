@@ -1,18 +1,43 @@
 <template>
   <v-container>
     <v-layout row justify-center pb-4>
-      <h1>Student View</h1>
-    </v-layout>
-    <v-layout row justify-center pb-4>
-      <v-data-table :headers="this.headers" :items="this.notClasses" class="elevation-1">
-        <template slot="items" slot-scope="props">
-          <td>{{ props.item.name }}</td>
-          <td>{{ props.item.teacher }}</td>
-          <td>
-            <v-btn @click="addStudent(props.item['.key'])">Add myself to class</v-btn>
-          </td>
-        </template>
-      </v-data-table>
+      <v-card dark>
+        <v-card-title>
+          <h2>Join a Class:</h2>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="search"
+            append-icon="search"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
+        </v-card-title>
+        <v-divider dark/>
+        <v-data-table
+          :headers="this.headers"
+          :items="this.notClasses"
+          :search="search"
+          class="elevation-1"
+          dark
+          :rows-per-page-items="[ 5, 7, 10, 15, { text: 'All', value: -1 } ]"
+          pagination.sync="{ rowsPerPage: 7 }"
+        >
+          <template slot="items" slot-scope="props">
+            <td>{{ props.item.name }}</td>
+            <td>{{ props.item.teacher }}</td>
+            <td>
+              <v-btn @click="addStudent(props.item['.key'])">Join Class</v-btn>
+            </td>
+          </template>
+          <v-alert
+            slot="no-results"
+            :value="true"
+            color="error"
+            icon="warning"
+          >Your search for "{{ search }}" found no results.</v-alert>
+        </v-data-table>
+      </v-card>
     </v-layout>
   </v-container>
 </template>
@@ -23,13 +48,14 @@ import firebase from "firebase";
 export default {
   data: () => ({
     headers: [
-      { text: "Class", value: "class" },
+      { text: "Class", value: "name" },
       { text: "Teacher", value: "student" },
       { text: "Key", value: "key" }
     ],
     myClasses: [],
     allClasses: [],
-    notClasses: []
+    notClasses: [],
+    search: null
   }),
   created() {
     // create a method to find the difference between myClass and All Classes
