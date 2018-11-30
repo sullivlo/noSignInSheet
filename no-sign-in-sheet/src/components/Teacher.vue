@@ -6,15 +6,12 @@
           <h2>My Classes
             <v-dialog v-model="dialog" width="500">
               <v-icon slot="activator" @click="showAddClass()">add</v-icon>
-
               <v-card>
                 <v-card-title class="headline grey lighten-2" primary-title>Create New Class</v-card-title>
-
                 <v-card-text>Enter Name:
                   <v-text-field v-model="cName" placeholder="Class Name"/>
                 </v-card-text>
                 <v-divider></v-divider>
-
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="primary" flat @click="dialog = false">Cancel</v-btn>
@@ -32,14 +29,15 @@
             hide-details
           ></v-text-field>
         </v-card-title>
-
+        <v-divider dark/>
         <v-data-table
           :headers="this.headers"
           :items="classes"
           :search="search"
           class="elevation-1"
           dark
-          :rows-per-page-items="[ 7, 10, 15, { text: 'All', value: -1 } ]"
+          :rows-per-page-items="[ 5, 7, 10, 15, { text: 'All', value: -1 } ]"
+          pagination.sync="{ rowsPerPage: 7 }"
         >
           <template slot="items" slot-scope="props">
             <td>{{ props.item.name }}</td>

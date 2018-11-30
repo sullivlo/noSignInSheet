@@ -4,9 +4,9 @@
       <h1>Student View</h1>
     </v-layout>
     <v-layout row justify-center pb-4>
-      <v-data-table :headers="this.headers" :items="myClasses" class="elevation-1">
+      <v-data-table :headers="this.headers" :items="this.notClasses" class="elevation-1">
         <template slot="items" slot-scope="props">
-          <td>{{ props.item.className }}</td>
+          <td>{{ props.item.name }}</td>
           <td>{{ props.item.teacher }}</td>
           <td>
             <v-btn @click="addStudent(props.item['.key'])">Add myself to class</v-btn>
@@ -33,14 +33,25 @@ export default {
   }),
   created() {
     // create a method to find the difference between myClass and All Classes
-    this.createClasses();
+    //this.createClasses();
   },
   firebase() {
     return {
-      allClasses: firebase
-        .database()
-        .ref()
-        .child("classes")
+      allClasses: {
+        source: firebase
+          .database()
+          .ref()
+          .child("classes"),
+        // optionally bind as an object
+        asObject: false,
+        // optionally provide the cancelCallback
+        cancelCallback: function() {},
+        // this is called once the data has been retrieved from firebase
+        readyCallback: function() {
+          console.info("Info");
+          this.createClasses();
+        }
+      }
     };
   },
 
@@ -66,31 +77,46 @@ export default {
       //loop through all this.allCasses
       //  check if current user is in the student list
 
+      console.log("All Classes:");
       console.log(this.allClasses);
       console.log(typeof this.allClasses);
 
       var tmpMyClasses = [];
       var tmpNotMyClasses = [];
 
-      for (var numClass in this.allClasses) {
-        var currStudent = this.allClasses[numClass].students;
+      console.log("Before class loop");
 
-        if (currStudent != null) {
-          //console.log(currStudent);
-          for (var numStud in currStudent) {
-            var strEmail = currStudent[numStud].email;
-            if (strEmail == this.$store.state.email) {
+      //loop thru classes
+      for (var currClass in this.allClasses) {
+        console.log("In class loop");
+        var studList = this.allClasses[currClass].students;
+        var inClass = false;
+
+        if (studList != null) {
+          //console.log(studList);
+
+          //loop thru student list
+          for (var stud in studList) {
+            var stuEmail = studList[stud].email;
+            if (stuEmail == this.$store.state.email) {
               console.log("I am in this class yee haw ");
-              console.log(this.allClasses[numClass]);
+              //console.log(this.allClasses[currClass]);
               //add classes to myClasses
-              tmpMyClasses.push(this.allClasses[numClass]);
+              inClass = true;
+              //tmpMyClasses.push(this.allClasses[currClass]);
             } else {
               console.log("I am not in this class darn it  ");
-              console.log(this.allClasses[numClass]);
+              //console.log(this.allClasses[currClass]);
               //add classes to not myClasses
-              tmpNotMyClasses.push(this.allClasses[numClass]);
+              //tmpNotMyClasses.push(this.allClasses[currClass]);
             }
           }
+        }
+
+        if (inClass) {
+          tmpMyClasses.push(this.allClasses[currClass]);
+        } else {
+          tmpNotMyClasses.push(this.allClasses[currClass]);
         }
       }
       console.log(typeof tmpNotMyClasses);
@@ -98,7 +124,9 @@ export default {
 
       console.log(typeof tmpMyClasses);
       console.log(tmpMyClasses);
-      return { myClasses: tmpMyClasses, notClasses: tmpNotMyClasses };
+      this.myClasses = tmpMyClasses;
+      this.notClasses = tmpNotMyClasses;
+      //return { myClasses: tmpMyClasses, notClasses: tmpNotMyClasses };
     }
   },
   //life cycle diagram
