@@ -4,7 +4,7 @@
       <h1>Student View</h1>
     </v-layout>
     <v-layout row justify-center pb-4>
-      <v-data-table :headers="this.headers" :items="classes" class="elevation-1">
+      <v-data-table :headers="this.headers" :items="myClasses" class="elevation-1">
         <template slot="items" slot-scope="props">
           <td>{{ props.item.className }}</td>
           <td>{{ props.item.teacher }}</td>
@@ -27,33 +27,24 @@ export default {
       { text: "Teacher", value: "student" },
       { text: "Key", value: "key" }
     ],
-    classes: []
+    myClasses: [],
+    allClasses: [],
+    notClasses: []
   }),
+  created() {
+    // create a method to find the difference between myClass and All Classes
+    this.createClasses();
+  },
   firebase() {
     return {
-      classes: firebase.database().ref("classes")
+      allClasses: firebase
+        .database()
+        .ref()
+        .child("classes")
     };
   },
 
   methods: {
-    addClass(name) {
-      // Add a new document in collection "cities"
-      firebase
-        .firestore()
-        .collection("classes")
-        .doc()
-        .set({
-          name: name,
-          teacher: this.$store.state.uname,
-          email: this.$store.state.email
-        })
-        .then(function() {
-          console.log("Document successfully written!");
-        })
-        .catch(function(error) {
-          console.error("Error writing document: ", error);
-        });
-    },
     addStudent(id) {
       console.log(id);
       var myTime = new Date().toLocaleString();
@@ -68,6 +59,41 @@ export default {
           email: this.$store.state.email,
           name: this.$store.state.uname
         });
+      this.createClasses();
+    },
+    createClasses() {
+      //find classes not currently entrolled
+      //loop through all this.allCasses
+      //  check if current user is in the student list
+
+      console.log(this.allClasses);
+      console.log(typeof this.allClasses);
+
+      for (var numClass in this.allClasses) {
+        var currStudent = this.allClasses[numClass].students;
+
+        if (currStudent != null) {
+          //console.log(currStudent);
+          for (var numStud in currStudent) {
+            var strEmail = currStudent[numStud].email;
+            if (strEmail == this.$store.state.email) {
+              console.log("I am in in this class yee haw ");
+              console.log(this.allClasses[numClass]);
+              //add classes to myClasses
+            }
+          }
+        }
+      }
+
+      //
+      // Klass.students.each(Stud => {
+      //   //create flag before class loop
+      //   console.log("in loop");
+      //   // if stud.email = this.$store.state.email
+      //   //  then flag = true
+      // });
+      // if flag true then add class to myClass
+      // else add to not my classes
     }
   },
   //life cycle diagram
