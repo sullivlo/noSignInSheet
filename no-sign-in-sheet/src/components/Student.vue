@@ -150,73 +150,82 @@ export default {
       const myLong = this.$store.state.myLong;
 
       var tmpSession = null;
-      tmpSession = firebase
+      firebase
         .database()
         .ref()
         .child(`classes/${id}/sessions`)
-        .orderByChild("date")
-        .limitToLast(1)
-        .once("child_added", function(snapshot) {
-          var teacherDate = snapshot.val().date;
+        .once("value", snapshot => {
+          tmpSession = snapshot.val();
+        });
 
-          // var teacherDate = teacherDate.split(",");
-          // var tmpTime = myTime.split(",");
+      if (tmpSession) {
+        firebase
+          .database()
+          .ref()
+          .child(`classes/${id}/sessions`)
+          .orderByChild("date")
+          .limitToLast(1)
+          .once("child_added", function(snapshot) {
+            var teacherDate = snapshot.val().date;
 
-          console.log(typeof teacherDate);
-          console.log(typeof myTime);
+            // var teacherDate = teacherDate.split(",");
+            // var tmpTime = myTime.split(",");
 
-          var x = new Date(teacherDate);
-          var y = new Date(myTime);
-          console.log(y - x);
-          //check to see if the current time is within an hour of session creation
-          if (y.getTime() - x.getTime() < 3600000) {
-            firebase
-              .database()
-              .ref()
-              .child(`classes/${id}/sessions/${snapshot.key}/attendees`)
-              .on("child_added", function(tmpAttends) {
-                if (tmpAttends.val().email == e) {
-                  CheckedInflag = true;
+            console.log(typeof teacherDate);
+            console.log(typeof myTime);
+
+            var x = new Date(teacherDate);
+            var y = new Date(myTime);
+            console.log(y - x);
+            //check to see if the current time is within an hour of session creation
+            if (y.getTime() - x.getTime() < 3600000) {
+              firebase
+                .database()
+                .ref()
+                .child(`classes/${id}/sessions/${snapshot.key}/attendees`)
+                .on("child_added", function(tmpAttends) {
+                  if (tmpAttends.val().email == e) {
+                    CheckedInflag = true;
+                  }
+                });
+
+              if (!CheckedInflag) {
+                var teacherLat = snapshot.val().lat;
+                var teacherLong = snapshot.val().long;
+
+                console.log(teacherLat);
+                console.log(teacherLong);
+
+                if (
+                  (myLat - teacherLat < 0.000000001 ||
+                    teacherLat - myLat < 0.000000001) &&
+                  (myLong - teacherLong < 0.000000001 ||
+                    teacherLong - myLong < 0.000000001)
+                ) {
+                  firebase
+                    .database()
+                    .ref()
+                    .child(`classes/${id}/sessions/${snapshot.key}/attendees`)
+                    .push()
+                    .set({
+                      email: e,
+                      name: u,
+                      present: true
+                    });
+                } else {
+                  alert("gps loaction does not match the teachers");
                 }
-              });
-
-            if (!CheckedInflag) {
-              var teacherLat = snapshot.val().lat;
-              var teacherLong = snapshot.val().long;
-
-              console.log(myLat - teacherLat);
-              console.log(myLong - teacherLong);
-
-              if (
-                (myLat - teacherLat < 0.000000001 ||
-                  teacherLat - myLat < 0.000000001) &&
-                (myLong - teacherLong < 0.000000001 ||
-                  teacherLong - myLong < 0.000000001)
-              ) {
-                firebase
-                  .database()
-                  .ref()
-                  .child(`classes/${id}/sessions/${snapshot.key}/attendees`)
-                  .push()
-                  .set({
-                    email: e,
-                    name: u,
-                    present: true
-                  });
               } else {
-                alert("gps loaction does not match the teachers");
+                alert("you are already checked in");
               }
             } else {
-              alert("you are already checked in");
+              alert("teacher created the session more than an hour ago");
             }
-          } else {
-            alert("teacher created the session more than an hour ago");
-          }
-        });
-      console.log(tmpSession);
-      for (var tmpSess in tmpSession) {
-        console.log(tmpSession[tmpSess]);
+          });
+      } else {
+        alert("Teacher hasn't created a session");
       }
+
       this.createClasses();
     },
     createClasses() {
