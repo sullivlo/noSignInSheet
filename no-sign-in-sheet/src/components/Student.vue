@@ -47,7 +47,7 @@
             <h2>My Classes:</h2>
             <v-spacer></v-spacer>
             <v-text-field
-              v-model="search"
+              v-model="search2"
               append-icon="search"
               label="Search"
               single-line
@@ -58,7 +58,7 @@
           <v-data-table
             :headers="this.headers"
             :items="this.myClasses"
-            :search="search"
+            :search="search2"
             class="elevation-1"
             dark
             :rows-per-page-items="[ 7, 10, 15, { text: 'All', value: -1 } ]"
@@ -97,7 +97,8 @@ export default {
     myClasses: [],
     allClasses: [],
     notClasses: [],
-    search: null
+    search: null,
+    search2: null
   }),
   created() {
     // create a method to find the difference between myClass and All Classes
