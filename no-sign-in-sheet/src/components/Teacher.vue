@@ -40,7 +40,26 @@
           pagination.sync="{ rowsPerPage: 7 }"
         >
           <template slot="items" slot-scope="props">
-            <td>{{ props.item.name }}</td>
+            <td>
+              <v-dialog v-model="dialog2" width="500">
+                <v-icon slot="activator">remove_circle_outline</v-icon>
+                <v-card>
+                  <v-card-title class="headline grey lighten-2" primary-title>Delete Class:</v-card-title>
+                  <v-card-text>Are you sure you want to delete {{ props.item.name }}?</v-card-text>
+                  <v-divider></v-divider>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" flat @click="dialog2 = false">Cancel</v-btn>
+                    <v-btn
+                      color="primary"
+                      flat
+                      @click="dialog2 = false, removeClass(props.item['.key'])"
+                    >Remove</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+              {{ props.item.name }}
+            </td>
             <td>{{ props.item.teacher }}</td>
             <td>
               <v-btn @click="launchSession(props.item['.key'])">New Session</v-btn>
@@ -75,6 +94,7 @@ export default {
     classes: [],
     cName: null,
     dialog: null,
+    dialog2: null,
     search: ""
   }),
   firebase() {
@@ -87,6 +107,14 @@ export default {
     };
   },
   methods: {
+    removeClass(key) {
+      // Add a new document in collection "cities"
+      firebase
+        .database()
+        .ref()
+        .child(`classes/${key}`)
+        .remove();
+    },
     addClass(name) {
       // Add a new document in collection "cities"
       firebase
