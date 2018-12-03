@@ -1,7 +1,8 @@
 <template>
   <v-container>
-    <v-layout row>
-        <h1>Settings</h1>
+    <v-layout column>
+      <h1>Settings Page</h1>
+      <h3>This is a placeholder page for future setting implementations.</h3>
     </v-layout>
   </v-container>
 </template>

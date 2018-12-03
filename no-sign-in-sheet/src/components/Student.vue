@@ -92,7 +92,7 @@ export default {
     headers: [
       { text: "Class", value: "name" },
       { text: "Teacher", value: "student" },
-      { text: "Key", value: "key" }
+      { text: "Join", value: "join" }
     ],
     myClasses: [],
     allClasses: [],
