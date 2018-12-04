@@ -23,6 +23,7 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
+      <v-icon @click="goHome()">home</v-icon>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
     </v-toolbar>
 
@@ -42,6 +43,9 @@
 import firebase from "firebase";
 export default {
   name: "App",
+  created() {
+    this.router = this.$router;
+  },
   data() {
     return {
       //
@@ -53,6 +57,9 @@ export default {
     };
   },
   methods: {
+    goHome() {
+      this.$router.push({ name: "home" });
+    },
     menuClicked(key) {
       console.log(key.title);
       if (key.component == "logOut") {
