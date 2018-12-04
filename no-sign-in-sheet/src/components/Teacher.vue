@@ -137,11 +137,9 @@ export default {
       this.cName = "";
     },
     showHistory(id) {
-      //
       this.$router.push({ name: "history", params: { id: id } });
     },
     launchSession(id) {
-      console.log(id);
       var myTime = new Date().toLocaleString();
       var active = false;
 
@@ -154,18 +152,11 @@ export default {
         .once("child_added", function(snapshot) {
           var teacherDate = snapshot.val().date;
 
-          // var teacherDate = teacherDate.split(",");
-          // var tmpTime = myTime.split(",");
-
-          console.log(typeof teacherDate);
-          console.log(typeof myTime);
-
           var x = new Date(teacherDate);
           var y = new Date(myTime);
-          console.log(y - x);
+
           //check to see if the current time is within an hour of session creation
           if (y.getTime() - x.getTime() < 3600000) {
-            //
             active = true;
           }
         });
