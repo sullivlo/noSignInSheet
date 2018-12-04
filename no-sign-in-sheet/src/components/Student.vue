@@ -200,7 +200,7 @@ export default {
                   (myLong - teacherLong < 0.000000001 ||
                     teacherLong - myLong < 0.000000001)
                 ) {
-                  alert("Successfully checked in");
+                  alert("Successfully Checked-in!");
                   firebase
                     .database()
                     .ref()
@@ -212,17 +212,17 @@ export default {
                       present: true
                     });
                 } else {
-                  alert("gps loaction does not match the teachers");
+                  alert("GPS location does not match the teacher's.");
                 }
               } else {
-                alert("you are already checked in");
+                alert("Already Checked-in.");
               }
             } else {
-              alert("teacher created the session more than an hour ago");
+              alert("No active session available.");
             }
           });
       } else {
-        alert("Teacher hasn't created a session");
+        alert("No active session available.");
       }
 
       this.createClasses();
