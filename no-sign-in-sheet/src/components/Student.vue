@@ -201,6 +201,7 @@ export default {
                     teacherLong - myLong < 0.000000001)
                 ) {
                   alert("Successfully checked in");
+
                   firebase
                     .database()
                     .ref()
