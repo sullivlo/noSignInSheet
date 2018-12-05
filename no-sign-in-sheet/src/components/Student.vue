@@ -114,7 +114,6 @@ export default {
         cancelCallback: function() {},
         // this is called once the data has been retrieved from firebase
         readyCallback: function() {
-          console.info("Info");
           this.createClasses();
         }
       }
@@ -123,7 +122,6 @@ export default {
 
   methods: {
     addStudent(id) {
-      console.log(id);
       var myTime = new Date().toLocaleString();
       firebase
         .database()
@@ -165,16 +163,8 @@ export default {
           .limitToLast(1)
           .once("child_added", function(snapshot) {
             var teacherDate = snapshot.val().date;
-
-            // var teacherDate = teacherDate.split(",");
-            // var tmpTime = myTime.split(",");
-
-            console.log(typeof teacherDate);
-            console.log(typeof myTime);
-
             var x = new Date(teacherDate);
             var y = new Date(myTime);
-            console.log(y - x);
             //check to see if the current time is within an hour of session creation
             if (y.getTime() - x.getTime() < 3600000) {
               firebase
@@ -191,17 +181,13 @@ export default {
                 var teacherLat = snapshot.val().lat;
                 var teacherLong = snapshot.val().long;
 
-                console.log(teacherLat);
-                console.log(teacherLong);
-
                 if (
                   (myLat - teacherLat < 0.000000001 ||
                     teacherLat - myLat < 0.000000001) &&
                   (myLong - teacherLong < 0.000000001 ||
                     teacherLong - myLong < 0.000000001)
                 ) {
-                  alert("Successfully checked in");
-
+                  alert("Successfully Checked-in!");
                   firebase
                     .database()
                     .ref()
@@ -213,17 +199,17 @@ export default {
                       present: true
                     });
                 } else {
-                  alert("gps loaction does not match the teachers");
+                  alert("GPS location does not match the teacher's.");
                 }
               } else {
-                alert("you are already checked in");
+                alert("Already Checked-in.");
               }
             } else {
-              alert("teacher created the session more than an hour ago");
+              alert("No active session available.");
             }
           });
       } else {
-        alert("Teacher hasn't created a session");
+        alert("No active session available.");
       }
 
       this.createClasses();
@@ -231,40 +217,23 @@ export default {
     createClasses() {
       //find classes not currently entrolled
       //loop through all this.allCasses
-      //  check if current user is in the student list
-
-      // console.log("All Classes:");
-      // console.log(this.allClasses);
-      // console.log(typeof this.allClasses);
+      //check if current user is in the student list
 
       var tmpMyClasses = [];
       var tmpNotMyClasses = [];
 
-      // console.log("Before class loop");
-
       //loop thru classes
       for (var currClass in this.allClasses) {
-        // console.log("In class loop");
         var studList = this.allClasses[currClass].students;
         var inClass = false;
 
         if (studList != null) {
-          //console.log(studList);
-
           //loop thru student list
           for (var stud in studList) {
             var stuEmail = studList[stud].email;
             if (stuEmail == this.$store.state.email) {
-              // console.log("I am in this class yee haw ");
-              //console.log(this.allClasses[currClass]);
-              //add classes to myClasses
+              //student is in this class
               inClass = true;
-              //tmpMyClasses.push(this.allClasses[currClass]);
-            } else {
-              // console.log("I am not in this class darn it  ");
-              //console.log(this.allClasses[currClass]);
-              //add classes to not myClasses
-              //tmpNotMyClasses.push(this.allClasses[currClass]);
             }
           }
         }
@@ -278,11 +247,8 @@ export default {
 
       this.myClasses = tmpMyClasses;
       this.notClasses = tmpNotMyClasses;
-      //return { myClasses: tmpMyClasses, notClasses: tmpNotMyClasses };
     }
-  },
-  //life cycle diagram
-  beforeMount() {}
+  }
 };
 </script>
 

@@ -1,9 +1,14 @@
 <template>
   <v-container>
     <v-layout row pb-4>
+      <v-label>
+        <h1>History of {{ this.class.name }}</h1>
+      </v-label>
+    </v-layout>
+    <v-layout row pb-4 justify-center>
       <v-card dark>
         <v-card-title>
-          <h2>{{ this.class.name }} History</h2>
+          <h2>Select a Session:</h2>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -37,11 +42,12 @@
           >Your search for "{{ search }}" found no results.</v-alert>
         </v-data-table>
       </v-card>
-      <v-spacer/>
+    </v-layout>
+    <v-layout row justify-center>
       <v-card dark>
         <v-card-title>
-          <h2>{{ this.days[this.date.getDay()] }}, {{ this.date.getDay() }}/{{ this.date.getMonth() }}/{{ this.date.getFullYear() }}</h2>
-          <v-spacer></v-spacer>
+          <h2>Attendence on {{ this.date.getDay() }}/{{ this.date.getMonth() }}/{{ this.date.getFullYear() }}</h2>
+          <v-spacer pl-8></v-spacer>
           <v-text-field
             v-model="search"
             append-icon="search"

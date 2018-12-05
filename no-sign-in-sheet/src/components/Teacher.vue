@@ -3,23 +3,25 @@
     <v-layout row justify-center pb-4>
       <v-card dark>
         <v-card-title>
-          <h2>My Classes
-            <v-dialog v-model="dialog" width="500">
-              <v-icon slot="activator" @click="showAddClass()">add</v-icon>
-              <v-card>
-                <v-card-title class="headline grey lighten-2" primary-title>Create New Class</v-card-title>
-                <v-card-text>Enter Name:
-                  <v-text-field v-model="cName" placeholder="Class Name"/>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" flat @click="dialog = false">Cancel</v-btn>
-                  <v-btn color="primary" flat @click="dialog = false, addClass(cName)">Create</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </h2>
+          <h2>My Classes</h2>
+          <v-tooltip top>
+            <v-icon slot="activator" @click="dialog = true">add</v-icon>
+            <span>Add a class.</span>
+          </v-tooltip>
+          <v-dialog v-model="dialog" width="500">
+            <v-card>
+              <v-card-title class="headline grey lighten-2" primary-title>Create New Class</v-card-title>
+              <v-card-text>Enter Name:
+                <v-text-field v-model="cName" placeholder="Class Name"/>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" flat @click="dialog = false">Cancel</v-btn>
+                <v-btn color="primary" flat @click="dialog = false, addClass(cName)">Create</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -41,8 +43,12 @@
         >
           <template slot="items" slot-scope="props">
             <td>
+              <v-tooltip top>
+                <v-icon slot="activator" @click="dialog2 = true">remove_circle_outline</v-icon>
+                <span>Delete this class.</span>
+              </v-tooltip>
+              {{ props.item.name }}
               <v-dialog v-model="dialog2" width="500">
-                <v-icon slot="activator">remove_circle_outline</v-icon>
                 <v-card>
                   <v-card-title class="headline grey lighten-2" primary-title>Delete Class:</v-card-title>
                   <v-card-text>Are you sure you want to delete {{ props.item.name }}?</v-card-text>
@@ -58,7 +64,6 @@
                   </v-card-actions>
                 </v-card>
               </v-dialog>
-              {{ props.item.name }}
             </td>
             <td>{{ props.item.teacher }}</td>
             <td>
@@ -132,25 +137,48 @@ export default {
       this.cName = "";
     },
     showHistory(id) {
-      //
       this.$router.push({ name: "history", params: { id: id } });
     },
     launchSession(id) {
-      console.log(id);
       var myTime = new Date().toLocaleString();
+      var active = false;
+
       firebase
         .database()
         .ref()
-        .child("classes")
-        .child(id)
-        .child("sessions")
-        .push()
-        .set({
-          lat: this.$store.state.myLat,
-          long: this.$store.state.myLong,
-          totalAttendees: "0",
-          date: myTime
+        .child(`classes/${id}/sessions`)
+        .orderByChild("date")
+        .limitToLast(1)
+        .once("child_added", function(snapshot) {
+          var teacherDate = snapshot.val().date;
+
+          var x = new Date(teacherDate);
+          var y = new Date(myTime);
+
+          //check to see if the current time is within an hour of session creation
+          if (y.getTime() - x.getTime() < 3600000) {
+            active = true;
+          }
         });
+
+      if (!active) {
+        firebase
+          .database()
+          .ref()
+          .child("classes")
+          .child(id)
+          .child("sessions")
+          .push()
+          .set({
+            lat: this.$store.state.myLat,
+            long: this.$store.state.myLong,
+            totalAttendees: "0",
+            date: myTime
+          });
+        alert("Session created!");
+      } else {
+        alert("There is already an active session!");
+      }
     }
   }
 };
